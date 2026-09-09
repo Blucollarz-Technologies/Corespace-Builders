@@ -1,3 +1,8 @@
+import dns from 'node:dns'
+
+// Some Windows networks refuse SRV DNS queries from Node (mongodb+srv:// fails with ECONNREFUSED).
+dns.setServers(['8.8.8.8', '1.1.1.1'])
+
 import { revalidateRedirects } from '@hooks/revalidateRedirects'
 import { mongooseAdapter } from '@payloadcms/db-mongodb'
 import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
