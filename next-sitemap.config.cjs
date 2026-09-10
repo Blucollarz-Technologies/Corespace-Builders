@@ -1,4 +1,5 @@
-const nextDistDir = process.env.VERCEL ? '.next' : 'node_modules/.cache/next'
+const { getNextDistDir } = require('./next-dist-dir.cjs')
+const nextDistDir = getNextDistDir()
 
 module.exports = {
   siteUrl:

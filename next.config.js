@@ -1,6 +1,10 @@
 import { withPayload } from '@payloadcms/next/withPayload'
+import { createRequire } from 'node:module'
 import path from 'path'
 import { fileURLToPath } from 'node:url'
+
+const require = createRequire(import.meta.url)
+const { getNextDistDir } = require('./next-dist-dir.cjs')
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
@@ -37,8 +41,7 @@ const localhost = process.env.NEXT_PUBLIC_IS_LIVE
       },
     ]
 
-// Vercel expects `.next`; local OneDrive setups use a cache dir to avoid EINVAL/readlink crashes.
-const nextDistDir = process.env.VERCEL ? '.next' : 'node_modules/.cache/next'
+const nextDistDir = getNextDistDir()
 
 const nextConfig = withBundleAnalyzer({
   distDir: nextDistDir,
