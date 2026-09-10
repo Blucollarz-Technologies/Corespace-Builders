@@ -8,13 +8,9 @@ export const redirects = async () => {
       permanent: true,
     },
     {
-      source: '/blog',
-      destination: '/posts/blog',
-      permanent: true,
-    },
-    {
-      source: '/blog/:slug',
-      destination: '/posts/blog/:slug',
+      // :slug+ requires a path segment so bare /blog is not redirected to /posts/blog
+      source: '/blog/:slug+',
+      destination: '/posts/blog/:slug*',
       permanent: true,
     },
     {

@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev",
+    "dev:clean": "node -e \"for (const p of ['.next','node_modules/.cache/next']) { try { require('fs').rmSync(p,{recursive:true,force:true}) } catch {} }\" && cross-env NODE_OPTIONS=--no-deprecation next dev",
     "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
     "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
     "build": "bun payload migrate && cross-env NODE_OPTIONS=--no-deprecation next build",
