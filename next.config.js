@@ -38,6 +38,8 @@ const localhost = process.env.NEXT_PUBLIC_IS_LIVE
     ]
 
 const nextConfig = withBundleAnalyzer({
+  // Keep Next.js build output out of OneDrive-synced `.next` to avoid EINVAL/readlink crashes.
+  distDir: 'node_modules/.cache/next',
   eslint: {
     ignoreDuringBuilds: true,
   },
