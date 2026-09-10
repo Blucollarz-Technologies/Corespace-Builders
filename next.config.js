@@ -37,9 +37,11 @@ const localhost = process.env.NEXT_PUBLIC_IS_LIVE
       },
     ]
 
+// Vercel expects `.next`; local OneDrive setups use a cache dir to avoid EINVAL/readlink crashes.
+const nextDistDir = process.env.VERCEL ? '.next' : 'node_modules/.cache/next'
+
 const nextConfig = withBundleAnalyzer({
-  // Keep Next.js build output out of OneDrive-synced `.next` to avoid EINVAL/readlink crashes.
-  distDir: 'node_modules/.cache/next',
+  distDir: nextDistDir,
   eslint: {
     ignoreDuringBuilds: true,
   },
