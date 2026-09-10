@@ -312,7 +312,10 @@ export default buildConfig({
   ],
   cors: [
     process.env.PAYLOAD_PUBLIC_APP_URL || '',
-    'https://payloadcms.com',
+    process.env.NEXT_PUBLIC_SITE_URL || '',
+    'https://corespacebuilders.vercel.app',
+    'https://corespacebuilders.com',
+    'https://www.corespacebuilders.com',
   ].filter(Boolean),
   db: mongooseAdapter({
     url: process.env.DATABASE_URI || '',

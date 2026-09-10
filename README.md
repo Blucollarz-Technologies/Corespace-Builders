@@ -1,3 +1,33 @@
+# Corespace Builders
+
+Website and CMS for [Corespace Builders](https://corespacebuilders.com) — homes, villas, and homestays in Coorg.
+
+## Deployment & admin
+
+| Environment | URL |
+|-------------|-----|
+| Production | `https://corespacebuilders.vercel.app` |
+| Admin login | `https://corespacebuilders.vercel.app/admin/login` |
+| Local dev | `http://localhost:3000/admin/login` |
+
+**Vercel environment variables** (required for production):
+
+```env
+NEXT_PUBLIC_SITE_URL=https://corespacebuilders.vercel.app
+PAYLOAD_PUBLIC_APP_URL=https://corespacebuilders.vercel.app
+PAYLOAD_SECRET=<your-secret>
+DATABASE_URI=<mongodb-uri>
+```
+
+## Local development
+
+```bash
+bun install
+bun run dev:clean   # clears cache and starts on port 3000
+```
+
+---
+
 # Payload Website
 
 This is the repository for [Payload's official website](https://payloadcms.com/). It was built completely in public using Payload itself, [more on that here](#⭐-the-cms).
