@@ -131,6 +131,17 @@ const nextConfig = withBundleAnalyzer({
     return configCopy
   },
   redirects,
+  async rewrites() {
+    return {
+      beforeFiles: [
+        // Serve the Corespace blog Page at /posts/blog (listing URL) as well as /blog
+        {
+          source: '/posts/blog',
+          destination: '/blog',
+        },
+      ],
+    }
+  },
   async headers() {
     const headers = [
       {
