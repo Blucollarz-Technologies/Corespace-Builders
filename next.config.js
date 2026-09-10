@@ -4,7 +4,7 @@ import path from 'path'
 import { fileURLToPath } from 'node:url'
 
 const require = createRequire(import.meta.url)
-const { getNextDistDir } = require('./next-dist-dir.cjs')
+const { getNextDistDir, isOneDriveProject } = require('./next-dist-dir.cjs')
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
@@ -109,8 +109,14 @@ const nextConfig = withBundleAnalyzer({
       '@graphql': path.resolve(dirname, './src/graphql'),
     },
   },
-  webpack: (config) => {
+  webpack: (config, { dev }) => {
     const configCopy = { ...config }
+
+    // OneDrive breaks webpack's filesystem cache during dev; use in-memory cache instead.
+    if (dev && isOneDriveProject()) {
+      configCopy.cache = { type: 'memory' }
+    }
+
     configCopy.resolve = {
       ...config.resolve,
       extensions: ['.ts', '.tsx', '.js', '.jsx'],

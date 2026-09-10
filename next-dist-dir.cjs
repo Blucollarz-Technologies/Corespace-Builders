@@ -13,4 +13,8 @@ function getNextDistDir() {
   return 'node_modules/.cache/next'
 }
 
-module.exports = { getNextDistDir }
+function isOneDriveProject() {
+  return process.platform === 'win32' && process.cwd().toLowerCase().includes('onedrive')
+}
+
+module.exports = { getNextDistDir, isOneDriveProject }
