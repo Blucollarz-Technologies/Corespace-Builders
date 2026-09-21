@@ -9,15 +9,40 @@ export const CorespaceFeaturedProjectsSection: Block = {
   },
   fields: [
     {
+      name: 'layout',
+      type: 'select',
+      defaultValue: 'carousel',
+      label: 'Layout',
+      required: true,
+      options: [
+        {
+          label: 'Carousel (Home)',
+          value: 'carousel',
+        },
+        {
+          label: 'Showcase (Projects page)',
+          value: 'showcase',
+        },
+      ],
+      admin: {
+        description:
+          'Use Carousel on the Home page. Use Showcase on the Projects page for alternating case-study cards.',
+      },
+    },
+    {
       name: 'eyebrow',
       type: 'text',
       defaultValue: 'PROOF OF WORK',
       label: 'Eyebrow label',
+      admin: {
+        condition: (_, siblingData) => siblingData?.layout === 'showcase',
+        description: 'Shown only in Showcase layout.',
+      },
     },
     {
       name: 'heading',
-      type: 'text',
-      defaultValue: 'Featured Projects',
+      type: 'textarea',
+      defaultValue: 'Real projects. Real planning. Real execution.',
       label: 'Heading',
       required: true,
     },
@@ -34,40 +59,28 @@ export const CorespaceFeaturedProjectsSection: Block = {
       minRows: 1,
       defaultValue: [
         {
+          categoryBadge: 'RESIDENTIAL HOME',
           title: 'Private Residence',
-          primaryTag: 'Residential Home',
-          tags: [{ label: 'Near Madikeri' }, { label: 'Planning + Construction' }],
-          challenge: 'Sloped terrain requiring careful layout planning.',
-          approach: [
-            { text: 'Terrain assessment' },
-            { text: 'Layout optimization' },
-            { text: 'Drainage planning' },
-          ],
-          outcome: 'A practical family home with efficient space utilization and long-term durability.',
+          location: 'NEAR MADIKERI',
+          scope: 'PLANNING + CONSTRUCTION',
+          description:
+            'Sloped terrain resolved with terrain assessment, layout optimization, and drainage planning.',
         },
         {
+          categoryBadge: 'VILLA / SECOND HOME',
           title: 'Premium Villa Development',
-          primaryTag: 'Villa / Second Home',
-          tags: [{ label: 'Coorg' }, { label: 'Design + Construction + Interiors' }],
-          challenge: 'Balancing premium design expectations with budget control.',
-          approach: [
-            { text: 'Early design alignment' },
-            { text: 'Integrated interior planning' },
-            { text: 'Cost-aware decision making' },
-          ],
-          outcome: 'A premium villa with strong design identity and controlled project costs.',
+          location: 'COORG',
+          scope: 'DESIGN + CONSTRUCTION + INTERIORS',
+          description:
+            'Premium design expectations balanced with cost-aware decisions and integrated interiors.',
         },
         {
+          categoryBadge: 'HOMESTAY DEVELOPMENT',
           title: 'Homestay Development',
-          primaryTag: 'Hospitality Investment',
-          tags: [{ label: 'Coorg' }, { label: 'Planning + Development' }],
-          challenge: 'Creating a guest-ready property with clear investment returns.',
-          approach: [
-            { text: 'Guest-flow planning' },
-            { text: 'Operational layout design' },
-            { text: 'Phased development planning' },
-          ],
-          outcome: 'A hospitality-ready property planned for both guest experience and returns.',
+          location: 'COORG',
+          scope: 'PLANNING + DEVELOPMENT',
+          description:
+            'Guest-experience planning, efficient room layouts, and hospitality-focused design.',
         },
       ],
       fields: [
@@ -78,28 +91,13 @@ export const CorespaceFeaturedProjectsSection: Block = {
           label: 'Project image',
         },
         {
-          name: 'primaryTag',
+          name: 'categoryBadge',
           type: 'text',
-          label: 'Primary tag',
+          label: 'Category badge',
           required: true,
           admin: {
-            description: 'Highlighted tag, e.g. Residential Home',
+            description: 'e.g. RESIDENTIAL HOME',
           },
-        },
-        {
-          name: 'tags',
-          type: 'array',
-          labels: {
-            plural: 'Secondary tags',
-            singular: 'Tag',
-          },
-          fields: [
-            {
-              name: 'label',
-              type: 'text',
-              required: true,
-            },
-          ],
         },
         {
           name: 'title',
@@ -107,19 +105,47 @@ export const CorespaceFeaturedProjectsSection: Block = {
           required: true,
         },
         {
+          name: 'location',
+          type: 'text',
+          required: true,
+          admin: {
+            description: 'e.g. NEAR MADIKERI',
+          },
+        },
+        {
+          name: 'scope',
+          type: 'text',
+          admin: {
+            description: 'Carousel: shown as SCOPE. Showcase: shown as a tag pill.',
+          },
+        },
+        {
+          name: 'description',
+          type: 'textarea',
+          admin: {
+            description: 'Carousel layout only.',
+            condition: (_, __, { blockData }) => blockData?.layout !== 'showcase',
+          },
+        },
+        {
           name: 'challenge',
           type: 'textarea',
-          required: true,
           label: 'Challenge',
+          admin: {
+            condition: (_, __, { blockData }) => blockData?.layout === 'showcase',
+          },
         },
         {
           name: 'approach',
           type: 'array',
           labels: {
             plural: 'Approach points',
-            singular: 'Point',
+            singular: 'Approach point',
           },
-          minRows: 1,
+          admin: {
+            initCollapsed: true,
+            condition: (_, __, { blockData }) => blockData?.layout === 'showcase',
+          },
           fields: [
             {
               name: 'text',
@@ -131,8 +157,10 @@ export const CorespaceFeaturedProjectsSection: Block = {
         {
           name: 'outcome',
           type: 'textarea',
-          required: true,
           label: 'Outcome',
+          admin: {
+            condition: (_, __, { blockData }) => blockData?.layout === 'showcase',
+          },
         },
       ],
     },

@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload'
 
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, revalidateTag } from 'next/cache'
 
 import { isAdmin } from '../access/isAdmin'
 import { publishedOnly } from '../access/publishedOnly'
@@ -326,18 +326,26 @@ export const Posts: CollectionConfig = {
             },
           })
 
+          const revalidatePostPaths = (categorySlug: string, postSlug: string) => {
+            revalidateTag(`post_${categorySlug}_${postSlug}`)
+            revalidateTag('posts')
+            revalidatePath(`/posts/${categorySlug}/${postSlug}`)
+            if (categorySlug === 'blog') {
+              revalidatePath(`/blog/${postSlug}`)
+            }
+          }
+
           if (!category) {
             throw new Error('Category not found')
           } else {
-            revalidatePath(`/${category.slug}/${doc.slug}`)
-            console.log(`Revalidated: /posts/${category.slug}/${doc.slug}`)
+            revalidatePostPaths(category.slug, doc.slug)
           }
 
-          if (!previousCategory) {
-            throw new Error('Previous category not found')
-          } else {
-            revalidatePath(`/${previousCategory.slug}/${previousDoc.slug}`)
-            console.log(`Revalidated: /posts/${previousCategory.slug}/${previousDoc.slug}`)
+          if (
+            previousCategory &&
+            (previousCategory.slug !== category?.slug || previousDoc.slug !== doc.slug)
+          ) {
+            revalidatePostPaths(previousCategory.slug, previousDoc.slug)
           }
         } catch (error) {
           console.error(error)
@@ -358,10 +366,12 @@ export const Posts: CollectionConfig = {
           if (!category) {
             throw new Error('Category not found')
           } else {
-            revalidatePath(`/${category.slug}`)
-            revalidatePath(`/${category.slug}/${doc.slug}`)
-            console.log(`Revalidated: /posts/${category.slug}`)
-            console.log(`Revalidated: /posts/${category.slug}/${doc.slug}`)
+            revalidateTag('posts')
+            revalidatePath(`/posts/${category.slug}`)
+            revalidatePath(`/posts/${category.slug}/${doc.slug}`)
+            if (category.slug === 'blog') {
+              revalidatePath(`/blog/${doc.slug}`)
+            }
           }
         } catch (error) {
           console.error(error)

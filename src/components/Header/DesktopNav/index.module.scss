@@ -84,7 +84,7 @@ $curve: cubic-bezier(0.165, 0.84, 0.44, 1);
 .actions {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
+  gap: 0.55rem;
   flex-shrink: 0;
 }
 
@@ -116,19 +116,27 @@ $curve: cubic-bezier(0.165, 0.84, 0.44, 1);
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
   width: 2.65rem;
   height: 2.65rem;
-  border-radius: 12px;
-  background: rgba(248, 244, 236, 0.1);
-  border: 1px solid rgba(248, 244, 236, 0.22);
-  color: var(--brand-ivory);
+  border-radius: 999px;
+  background: #25d366;
+  border: 1px solid #25d366;
+  color: #fff;
   text-decoration: none;
-  transition: opacity 160ms ease;
+  box-shadow: 0 4px 14px rgba(37, 211, 102, 0.28);
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    background 160ms ease;
 
   &:hover,
   &:focus-visible {
-    opacity: 0.9;
-    color: var(--brand-ivory);
+    transform: translateY(-1px);
+    background: #20bd5a;
+    border-color: #20bd5a;
+    box-shadow: 0 6px 18px rgba(37, 211, 102, 0.34);
+    color: #fff;
   }
 }
 

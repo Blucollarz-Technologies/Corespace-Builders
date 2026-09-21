@@ -10,10 +10,15 @@ import { unstable_cache } from 'next/cache'
 import { draftMode } from 'next/headers'
 import React from 'react'
 
-const getPost = async (slug, category, draft?) =>
-  draft
-    ? await fetchBlogPost(slug, category)
-    : await unstable_cache(fetchBlogPost, ['blogPost', `post-${slug}`])(slug, category)
+const getPost = async (slug: string, category: string, draft?: boolean) => {
+  if (draft) {
+    return fetchBlogPost(slug, category)
+  }
+
+  return unstable_cache(() => fetchBlogPost(slug, category), ['blogPost', category, slug], {
+    tags: [`post_${category}_${slug}`, 'posts'],
+  })()
+}
 
 const PostPage = async ({
   params,

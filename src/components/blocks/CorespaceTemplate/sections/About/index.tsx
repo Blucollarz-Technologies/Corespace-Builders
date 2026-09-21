@@ -2,7 +2,7 @@
 
 import type { Media as MediaType } from '@root/payload-types'
 
-import { CMSLink } from '@components/CMSLink/index'
+import { CMSLink, type LinkType, type Reference } from '@components/CMSLink/index'
 import { Media } from '@components/Media/index'
 import React from 'react'
 
@@ -11,8 +11,8 @@ import classes from './index.module.scss'
 type LinkGroup = {
   label?: null | string
   newTab?: boolean | null
-  reference?: any
-  type?: 'custom' | 'reference' | null
+  reference?: null | Reference
+  type?: LinkType
   url?: null | string
 }
 

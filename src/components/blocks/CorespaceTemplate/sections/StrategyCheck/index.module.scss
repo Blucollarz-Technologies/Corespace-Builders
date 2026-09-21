@@ -1,0 +1,213 @@
+@use '@scss/common' as *;
+
+.strategyCheck {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2rem, 4vw, 3rem);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  max-width: 44rem;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--brand-terracotta, #b8663b);
+}
+
+.eyebrowDash {
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.heading {
+  margin: 0;
+  font-family: var(--font-heading), Georgia, serif;
+  font-size: clamp(1.85rem, 3.2vw, 2.75rem);
+  font-weight: 600;
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  color: var(--brand-charcoal, #1e2522);
+}
+
+.subheading {
+  margin: 0;
+  font-size: clamp(1rem, 1.15vw, 1.08rem);
+  line-height: 1.55;
+  color: var(--brand-slate, #5f665f);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.85rem;
+  align-items: stretch;
+}
+
+.lightCard,
+.darkCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  min-height: 100%;
+  min-width: 0;
+  padding: clamp(1.5rem, 2.5vw, 2rem);
+  border-radius: 20px;
+}
+
+.lightCard {
+  background: #fff;
+  border: 1px solid rgba(221, 210, 192, 0.9);
+  box-shadow: var(--brand-shadow, 0 10px 30px rgba(31, 58, 52, 0.08));
+}
+
+.darkCard {
+  background: var(--brand-charcoal-forest, #172622);
+  border: 1px solid rgba(200, 184, 154, 0.12);
+  box-shadow: 0 14px 34px rgba(23, 38, 34, 0.22);
+}
+
+.cardLabel,
+.cardLabelLight {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.cardLabel {
+  color: var(--brand-terracotta, #b8663b);
+}
+
+.cardLabelLight {
+  color: var(--brand-stone, #c8b89a);
+}
+
+.cardTitle,
+.cardTitleLight {
+  margin: 0;
+  font-family: var(--font-heading), Georgia, serif;
+  font-size: clamp(1.25rem, 1.8vw, 1.55rem);
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.cardTitle {
+  color: var(--brand-charcoal, #1e2522);
+}
+
+.cardTitleLight {
+  color: var(--brand-ivory, #f8f4ec);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.sectionLabel,
+.sectionLabelStrong {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.4;
+  color: var(--brand-charcoal, #1e2522);
+}
+
+.sectionLabelStrong {
+  font-weight: 700;
+}
+
+.list,
+.listLight {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.list li,
+.listLight li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  font-size: 0.94rem;
+  line-height: 1.45;
+}
+
+.list li {
+  color: var(--brand-slate, #5f665f);
+}
+
+.listLight li {
+  color: rgba(248, 244, 236, 0.88);
+}
+
+.bullet,
+.bulletLight {
+  flex-shrink: 0;
+  width: 0.35rem;
+  height: 0.35rem;
+  margin-top: 0.5rem;
+  border-radius: 999px;
+}
+
+.bullet {
+  background: var(--brand-slate, #5f665f);
+}
+
+.bulletLight {
+  background: rgba(248, 244, 236, 0.55);
+}
+
+.hybridIntro {
+  margin: 0;
+  font-size: 0.96rem;
+  line-height: 1.5;
+  color: rgba(248, 244, 236, 0.9);
+}
+
+.hybridClosing {
+  margin: 0.35rem 0 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: rgba(248, 244, 236, 0.72);
+}
+
+@include large-break {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+}
+
+@include small-break {
+  .heading {
+    font-size: 1.8rem;
+  }
+
+  .lightCard,
+  .darkCard {
+    padding: 1.35rem 1.2rem;
+    border-radius: 18px;
+  }
+
+  .cardTitle,
+  .cardTitleLight {
+    font-size: 1.2rem;
+  }
+}

@@ -8,6 +8,8 @@ import { RichText } from '@components/RichText/index'
 import { ArrowIcon } from '@root/icons/ArrowIcon/index'
 import * as React from 'react'
 
+import { resolveWhatsAppUrl } from '@root/utilities/whatsapp'
+
 import { BrandLogo } from '../BrandLogo/index'
 import classes from './index.module.scss'
 
@@ -98,7 +100,8 @@ export const DesktopNav: React.FC<DesktopNavType> = ({
     setBackgroundStyles({ height: '0px' })
   }
 
-  const showWhatsApp = enableWhatsApp !== false && Boolean(whatsappUrl)
+  const resolvedWhatsAppUrl = resolveWhatsAppUrl(whatsappUrl)
+  const showWhatsApp = enableWhatsApp !== false && Boolean(resolvedWhatsAppUrl)
 
   return (
     <div className={classes.desktopNav}>
@@ -270,7 +273,7 @@ export const DesktopNav: React.FC<DesktopNavType> = ({
               <a
                 aria-label="Chat on WhatsApp"
                 className={classes.whatsapp}
-                href={whatsappUrl || 'https://wa.me/'}
+                href={resolvedWhatsAppUrl}
                 rel="noopener noreferrer"
                 target="_blank"
               >

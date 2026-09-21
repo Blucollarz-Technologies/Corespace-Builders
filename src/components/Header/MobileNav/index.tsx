@@ -13,6 +13,8 @@ import { usePathname } from 'next/navigation'
 import * as React from 'react'
 
 import { MenuIcon } from '../../../graphics/MenuIcon/index'
+import { resolveWhatsAppUrl } from '@root/utilities/whatsapp'
+
 import { BrandLogo } from '../BrandLogo/index'
 import classes from './index.module.scss'
 
@@ -54,7 +56,8 @@ const MobileNavItems = ({
     setActiveTab(index)
   }
 
-  const showWhatsApp = enableWhatsApp !== false && Boolean(whatsappUrl)
+  const resolvedWhatsAppUrl = resolveWhatsAppUrl(whatsappUrl)
+  const showWhatsApp = enableWhatsApp !== false && Boolean(resolvedWhatsAppUrl)
 
   return (
     <ul className={classes.mobileMenuItems}>
@@ -99,19 +102,21 @@ const MobileNavItems = ({
         )
       })}
 
-      {menuCta?.label && <CMSLink {...menuCta} className={classes.mobileCta} />}
-
-      {showWhatsApp && (
-        <a
-          aria-label="Chat on WhatsApp"
-          className={classes.mobileWhatsapp}
-          href={whatsappUrl || 'https://wa.me/'}
-          rel="noopener noreferrer"
-          target="_blank"
-        >
-          <WhatsAppIcon />
-          WhatsApp
-        </a>
+      {(menuCta?.label || showWhatsApp) && (
+        <div className={classes.mobileActions}>
+          {menuCta?.label && <CMSLink {...menuCta} className={classes.mobileCta} />}
+          {showWhatsApp && (
+            <a
+              aria-label="Chat on WhatsApp"
+              className={classes.mobileWhatsapp}
+              href={resolvedWhatsAppUrl}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              <WhatsAppIcon />
+            </a>
+          )}
+        </div>
       )}
     </ul>
   )

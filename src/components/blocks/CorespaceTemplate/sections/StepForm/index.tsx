@@ -7,6 +7,7 @@ import { RichText } from '@components/RichText/index'
 import Form from '@forms/Form/index'
 import { useForm, useFormProcessing } from '@forms/Form/context'
 import { getCookie } from '@root/utilities/get-cookie'
+import { resolveWhatsAppUrl } from '@root/utilities/whatsapp'
 import { usePathname, useRouter } from 'next/navigation'
 import React, { useCallback, useMemo, useState } from 'react'
 import { toast } from 'sonner'
@@ -28,6 +29,7 @@ export type CorespaceStepFormProps = {
   sidebarBody?: null | string
   sidebarPoints?: SidebarPoint[] | null
   sidebarTitle?: null | string
+  whatsappUrl?: null | string
 }
 
 type FormField = NonNullable<FormType['fields']>[number]
@@ -35,6 +37,75 @@ type SteppableField = Exclude<FormField, { blockType: 'message' }>
 
 const isSteppableField = (field: FormField): field is SteppableField => {
   return field.blockType !== 'message' && 'name' in field && Boolean(field.name)
+}
+
+type WizardStep =
+  | {
+      fields: SteppableField[]
+      kind: 'contact'
+      label: string
+    }
+  | {
+      field: SteppableField
+      kind: 'single'
+      label: string
+    }
+
+const isContactDetailsField = (field: SteppableField): boolean => {
+  return (
+    field.blockType === 'text' ||
+    field.blockType === 'email' ||
+    field.blockType === 'textarea' ||
+    field.blockType === 'checkbox' ||
+    field.blockType === 'number'
+  )
+}
+
+const buildWizardSteps = (fields: SteppableField[]): WizardStep[] => {
+  let contactStart = fields.length
+
+  for (let index = fields.length - 1; index >= 0; index -= 1) {
+    if (isContactDetailsField(fields[index])) {
+      contactStart = index
+    } else {
+      break
+    }
+  }
+
+  const steps: WizardStep[] = fields.slice(0, contactStart).map((field) => ({
+    field,
+    kind: 'single',
+    label: field.label || 'Continue',
+  }))
+
+  const contactFields = fields.slice(contactStart)
+
+  if (contactFields.length > 0) {
+    steps.push({
+      fields: contactFields,
+      kind: 'contact',
+      label: 'Contact Details',
+    })
+  }
+
+  return steps
+}
+
+const STEP_VALIDATION_MESSAGE = 'Please complete all required fields to continue.'
+
+const getStepFieldKey = (field: SteppableField, index: number) => field.id ?? `${field.name}-${index}`
+
+const isFieldValueEmpty = (field: SteppableField, value: unknown): boolean => {
+  if (field.blockType === 'checkbox') {
+    return !value
+  }
+
+  return (
+    value === undefined ||
+    value === null ||
+    value === '' ||
+    (Array.isArray(value) && value.length === 0)
+  )
 }
 
 const buildInitialState = (fields: FormField[]) => {
@@ -58,6 +129,56 @@ const buildInitialState = (fields: FormField[]) => {
   })
 
   return state
+}
+
+const ContactDetailsStep: React.FC<{
+  fields: SteppableField[]
+  form: FormType
+  isActive: boolean
+  isProcessing: boolean
+}> = ({ fields, form, isActive, isProcessing }) => {
+  return (
+    <div
+      aria-hidden={!isActive}
+      className={classes.stepBody}
+      hidden={!isActive}
+    >
+      <p className={classes.question}>Contact Details</p>
+      <div className={classes.contactDetails}>
+        {fields.map((field, fieldIndex) => {
+          const FieldComponent = cmsFields?.[field.blockType]
+          const isCheckbox = field.blockType === 'checkbox'
+
+          return (
+            <div
+              className={[classes.contactField, isCheckbox ? classes.contactCheckbox : '']
+                .filter(Boolean)
+                .join(' ')}
+              key={getStepFieldKey(field, fieldIndex)}
+            >
+              {!isCheckbox && 'label' in field && field.label ? (
+                <p className={classes.contactFieldLabel}>
+                  {field.label}
+                  {field.required ? ' *' : ''}
+                </p>
+              ) : null}
+              {FieldComponent ? (
+                <div className={classes.contactFieldWrap}>
+                  <FieldComponent
+                    form={form}
+                    path={field.name}
+                    {...field}
+                    disabled={isProcessing}
+                    label={isCheckbox ? field.label : null}
+                  />
+                </div>
+              ) : null}
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
 }
 
 const StepField: React.FC<{
@@ -105,53 +226,58 @@ const StepField: React.FC<{
 
 const StepNavigator: React.FC<{
   form: FormType
-  steps: SteppableField[]
-}> = ({ form, steps }) => {
+  steps: WizardStep[]
+  whatsappUrl?: null | string
+}> = ({ form, steps, whatsappUrl }) => {
   const [stepIndex, setStepIndex] = useState(0)
   const [stepError, setStepError] = useState<string | null>(null)
   const { dispatchFields, getField, handleSubmit } = useForm()
   const isProcessing = useFormProcessing()
 
   const totalSteps = steps.length
-  const currentField = steps[stepIndex]
+  const currentStep = steps[stepIndex]
   const isLastStep = stepIndex === totalSteps - 1
   const progress = totalSteps > 0 ? ((stepIndex + 1) / totalSteps) * 100 : 0
-
-  const currentLabel =
-    currentField && 'label' in currentField && currentField.label
-      ? currentField.label
-      : 'Continue'
+  const currentLabel = currentStep?.label || 'Continue'
+  const showWhatsApp = isLastStep && Boolean(whatsappUrl)
 
   const validateCurrentStep = useCallback(() => {
-    if (!currentField) {
+    if (!currentStep) {
       return true
     }
 
-    const fieldState = getField(currentField.name)
-    const value = fieldState?.value
-    const empty =
-      value === undefined ||
-      value === null ||
-      value === '' ||
-      (Array.isArray(value) && value.length === 0)
+    const fieldsToValidate =
+      currentStep.kind === 'contact' ? currentStep.fields : [currentStep.field]
 
-    if (currentField.required && empty) {
-      dispatchFields({
-        type: 'UPDATE',
-        payload: {
-          errorMessage: 'This field is required.',
-          path: currentField.name,
-          valid: false,
-          value: value ?? '',
-        },
-      })
-      setStepError('Please complete this step to continue.')
+    let hasError = false
+
+    for (const field of fieldsToValidate) {
+      const fieldState = getField(field.name)
+      const value = fieldState?.value
+      const empty = isFieldValueEmpty(field, value)
+
+      if (field.required && empty) {
+        hasError = true
+        dispatchFields({
+          type: 'UPDATE',
+          payload: {
+            errorMessage: STEP_VALIDATION_MESSAGE,
+            path: field.name,
+            valid: false,
+            value: value ?? (field.blockType === 'checkbox' ? false : ''),
+          },
+        })
+      }
+    }
+
+    if (hasError) {
+      setStepError(STEP_VALIDATION_MESSAGE)
       return false
     }
 
     setStepError(null)
     return true
-  }, [currentField, dispatchFields, getField])
+  }, [currentStep, dispatchFields, getField])
 
   const goNext = useCallback(() => {
     if (!validateCurrentStep()) {
@@ -176,7 +302,7 @@ const StepNavigator: React.FC<{
     setStepIndex((index) => Math.max(index - 1, 0))
   }, [])
 
-  if (!currentField) {
+  if (!currentStep) {
     return null
   }
 
@@ -193,18 +319,36 @@ const StepNavigator: React.FC<{
         <div className={classes.progressFill} style={{ width: `${progress}%` }} />
       </div>
 
-      {/* Keep every field mounted so values survive step changes */}
-      {steps.map((field, index) => (
-        <StepField
-          field={field}
-          form={form}
-          isActive={index === stepIndex}
-          isProcessing={isProcessing}
-          key={field.name}
-        />
-      ))}
+      {/* Keep every step mounted so values survive step changes */}
+      {steps.map((step, index) => {
+        if (step.kind === 'contact') {
+          return (
+            <ContactDetailsStep
+              fields={step.fields}
+              form={form}
+              isActive={index === stepIndex}
+              isProcessing={isProcessing}
+              key="contact-details"
+            />
+          )
+        }
 
-      {stepError && <p className={classes.fieldError}>{stepError}</p>}
+        return (
+          <StepField
+            field={step.field}
+            form={form}
+            isActive={index === stepIndex}
+            isProcessing={isProcessing}
+            key={getStepFieldKey(step.field, index)}
+          />
+        )
+      })}
+
+      {stepError ? (
+        <p className={classes.stepValidation} role="alert">
+          {stepError}
+        </p>
+      ) : null}
 
       <div className={classes.nav}>
         {stepIndex > 0 ? (
@@ -214,18 +358,30 @@ const StepNavigator: React.FC<{
         ) : (
           <span />
         )}
-        <button
-          className={classes.nextButton}
-          disabled={isProcessing}
-          onClick={goNext}
-          type="button"
-        >
-          {isProcessing
-            ? 'Submitting...'
-            : isLastStep
-              ? form.submitButtonLabel || 'Submit'
-              : 'Next'}
-        </button>
+        <div className={classes.navActions}>
+          {showWhatsApp ? (
+            <a
+              className={classes.whatsappButton}
+              href={whatsappUrl || undefined}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Chat on WhatsApp
+            </a>
+          ) : null}
+          <button
+            className={classes.nextButton}
+            disabled={isProcessing}
+            onClick={goNext}
+            type="button"
+          >
+            {isProcessing
+              ? 'Submitting...'
+              : isLastStep
+                ? form.submitButtonLabel || 'Submit'
+                : 'Next'}
+          </button>
+        </div>
       </div>
     </div>
   )
@@ -233,8 +389,9 @@ const StepNavigator: React.FC<{
 
 const StepFormInner: React.FC<{
   form: FormType
-  steps: SteppableField[]
-}> = ({ form, steps }) => {
+  steps: WizardStep[]
+  whatsappUrl?: null | string
+}> = ({ form, steps, whatsappUrl }) => {
   const [hasSubmitted, setHasSubmitted] = useState(false)
   const router = useRouter()
   const pathname = usePathname()
@@ -281,10 +438,22 @@ const StepFormInner: React.FC<{
       if (form.confirmationType === 'redirect' && form.redirect?.url) {
         const url = form.redirect.url
         const redirectUrl = new URL(url, process.env.NEXT_PUBLIC_SITE_URL)
+        const firstSelect = form.fields?.find(
+          (field) => field.blockType === 'select' && 'name' in field,
+        )
+
+        if (firstSelect && 'name' in firstSelect) {
+          const submittedValue = data[firstSelect.name]
+
+          if (submittedValue) {
+            redirectUrl.searchParams.set('project', String(submittedValue))
+          }
+        }
+
         if (url.startsWith('/') || redirectUrl.origin === process.env.NEXT_PUBLIC_SITE_URL) {
-          router.push(redirectUrl.href)
+          router.push(`${redirectUrl.pathname}${redirectUrl.search}`)
         } else {
-          window.location.assign(url)
+          window.location.assign(redirectUrl.href)
         }
       }
     },
@@ -309,7 +478,7 @@ const StepFormInner: React.FC<{
 
   return (
     <Form formId={form.id} initialState={initialState} onSubmit={onSubmit}>
-      <StepNavigator form={form} steps={steps} />
+      <StepNavigator form={form} steps={steps} whatsappUrl={whatsappUrl} />
     </Form>
   )
 }
@@ -321,7 +490,9 @@ export const CorespaceStepForm: React.FC<CorespaceStepFormProps> = ({
   sidebarBody,
   sidebarPoints,
   sidebarTitle,
+  whatsappUrl,
 }) => {
+  const resolvedWhatsAppUrl = resolveWhatsAppUrl(whatsappUrl)
   if (!form || typeof form === 'string') {
     return (
       <div className={classes.stepForm}>
@@ -334,9 +505,10 @@ export const CorespaceStepForm: React.FC<CorespaceStepFormProps> = ({
     )
   }
 
-  const steps = (form.fields || []).filter(isSteppableField)
+  const formFields = (form.fields || []).filter(isSteppableField)
+  const steps = buildWizardSteps(formFields)
 
-  if (!steps.length) {
+  if (!formFields.length) {
     return (
       <div className={classes.stepForm}>
         <div className={classes.header}>
@@ -379,7 +551,7 @@ export const CorespaceStepForm: React.FC<CorespaceStepFormProps> = ({
         </aside>
 
         <div className={classes.formSide}>
-          <StepFormInner form={form} steps={steps} />
+          <StepFormInner form={form} steps={steps} whatsappUrl={resolvedWhatsAppUrl} />
         </div>
       </div>
     </div>

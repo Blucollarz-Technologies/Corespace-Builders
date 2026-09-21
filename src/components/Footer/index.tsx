@@ -23,7 +23,13 @@ const FALLBACK_COLUMNS: NonNullable<FooterType['columns']> = [
     navItems: [
       { link: { type: 'custom', label: 'Portfolio', url: '/projects' } },
       { link: { type: 'custom', label: 'Homestay & Villa', url: '/projects/homestay-villa' } },
-      { link: { type: 'custom', label: 'Coorg Construction', url: '/projects/coorg' } },
+      {
+        link: {
+          type: 'custom',
+          label: 'Coorg Construction',
+          url: '/service/corespace-construction-services-coorg',
+        },
+      },
     ],
   },
   {
@@ -38,6 +44,7 @@ const FALLBACK_COLUMNS: NonNullable<FooterType['columns']> = [
     navItems: [
       { link: { type: 'custom', label: 'About', url: '/about' } },
       { link: { type: 'custom', label: 'Contact', url: '/contact' } },
+      { link: { type: 'custom', label: 'Thank You', url: '/thank-you' } },
       { link: { type: 'custom', label: 'Privacy', url: '/privacy' } },
       { link: { type: 'custom', label: 'Terms', url: '/terms' } },
     ],
@@ -69,8 +76,8 @@ export const Footer: React.FC<FooterType> = (props) => {
               <div className={classes.column} key={column.id ?? `${column.label}-${columnIndex}`}>
                 {column.label && <p className={classes.colHeader}>{column.label}</p>}
                 <ul className={classes.colItems}>
-                  {column.navItems?.map(({ link }, linkIndex) => (
-                    <li key={`${column.label}-${link?.label ?? linkIndex}`}>
+                  {column.navItems?.map(({ id, link }, linkIndex) => (
+                    <li key={id ?? `${column.label}-${linkIndex}-${link?.url ?? link?.label ?? 'link'}`}>
                       <CMSLink className={classes.link} {...link} />
                     </li>
                   ))}

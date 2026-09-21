@@ -1,0 +1,164 @@
+@use '@scss/common' as *;
+
+.typicalCostRanges {
+  width: 100%;
+}
+
+.shell {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.75rem, 3.5vw, 2.5rem);
+  padding: clamp(1.75rem, 3.5vw, 2.5rem);
+  border-radius: 24px;
+  background: var(--brand-charcoal-forest, #172622);
+  border: 1px solid rgba(200, 184, 154, 0.1);
+  box-shadow: 0 14px 34px rgba(23, 38, 34, 0.22);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  max-width: 40rem;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--brand-terracotta, #b8663b);
+}
+
+.eyebrowDash {
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.heading {
+  margin: 0;
+  font-family: var(--font-heading), Georgia, serif;
+  font-size: clamp(1.85rem, 3.2vw, 2.75rem);
+  font-weight: 600;
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  color: var(--brand-ivory, #f8f4ec);
+}
+
+.grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  min-height: 100%;
+  min-width: 0;
+  padding: clamp(1.35rem, 2.2vw, 1.75rem);
+  border-radius: 16px;
+  border: 1px solid rgba(200, 184, 154, 0.14);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.cardTitle {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: rgba(248, 244, 236, 0.92);
+}
+
+.price {
+  margin: 0;
+  font-family: var(--font-heading), Georgia, serif;
+  font-size: clamp(1.35rem, 2vw, 1.65rem);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--brand-ivory, #f8f4ec);
+
+  &[data-variant='accent'] {
+    color: var(--brand-terracotta, #b8663b);
+  }
+}
+
+.listLabel {
+  margin: 0.15rem 0 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--brand-terracotta, #b8663b);
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+
+  li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    font-size: 0.9rem;
+    line-height: 1.45;
+    color: rgba(248, 244, 236, 0.72);
+
+    span:last-child {
+      flex: 1;
+      min-width: 0;
+    }
+  }
+}
+
+.bullet {
+  flex-shrink: 0;
+  width: 0.3rem;
+  height: 0.3rem;
+  margin-top: 0.5rem;
+  border-radius: 999px;
+  background: rgba(248, 244, 236, 0.45);
+}
+
+@include large-break {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@include small-break {
+  .shell {
+    padding: 1.35rem 1.2rem;
+    border-radius: 18px;
+  }
+
+  .heading {
+    font-size: 1.8rem;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .card {
+    padding: 1.2rem 1.1rem;
+    border-radius: 14px;
+  }
+
+  .price {
+    font-size: 1.3rem;
+  }
+}

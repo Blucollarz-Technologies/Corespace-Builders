@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 480" width="1400" height="480" role="img" aria-label="Service areas map showing Coorg, Kodagu towns, and Bangalore">
+  <defs>
+    <style>
+      .map-title { font-family: Georgia, 'Times New Roman', serif; font-size: 15px; font-weight: 700; fill: #1e2522; }
+      .map-label { font-family: Inter, Arial, sans-serif; font-size: 13px; font-weight: 600; fill: #1e2522; }
+      .map-label-muted { font-family: Inter, Arial, sans-serif; font-size: 12px; font-weight: 500; fill: #6f756f; }
+    </style>
+  </defs>
+
+  <rect width="1400" height="480" fill="#f3ede3"/>
+
+  <path fill="#d8dfd2" d="M0 118 C 180 88, 360 132, 540 104 S 900 72, 1120 98 S 1300 118, 1400 96 V0 H0 Z"/>
+  <path fill="#b8c5b0" d="M0 188 C 220 148, 420 208, 640 172 S 980 132, 1220 168 S 1360 188, 1400 164 V96 C 1280 120, 1080 84, 880 112 S 480 96, 0 118 Z"/>
+  <path fill="#8fa192" d="M0 268 C 260 228, 500 288, 760 252 S 1080 212, 1320 248 S 1380 262, 1400 244 V164 C 1220 188, 980 148, 720 180 S 320 168, 0 188 Z"/>
+  <path fill="#5f7568" d="M0 348 C 280 308, 540 368, 820 332 S 1140 292, 1400 328 V244 C 1280 268, 1040 228, 780 260 S 340 248, 0 268 Z"/>
+  <path fill="#3f5248" d="M0 480 H1400 V328 C 1180 360, 940 320, 700 352 S 280 380, 0 348 Z"/>
+
+  <path d="M120 72 C 360 28, 620 88, 860 52 S 1120 24, 1280 58" fill="none" stroke="#c9bfb0" stroke-dasharray="7 9" stroke-width="2"/>
+
+  <path d="M180 392 C 340 352, 500 388, 660 360 S 920 332, 1080 360" fill="none" stroke="rgba(255,255,255,0.22)" stroke-dasharray="7 9" stroke-width="2"/>
+  <path d="M80 300 C 280 260, 460 310, 640 282 S 900 252, 1100 280" fill="none" stroke="rgba(255,255,255,0.18)" stroke-dasharray="7 9" stroke-width="2"/>
+
+  <g transform="translate(1180 128)">
+    <circle cx="0" cy="0" r="16" fill="none" stroke="#1f3a34" stroke-width="1.6"/>
+    <circle cx="0" cy="0" r="5" fill="#1f3a34"/>
+    <text class="map-title" text-anchor="end" x="-22" y="5">Bangalore</text>
+  </g>
+
+  <g transform="translate(300 168)">
+    <circle cx="0" cy="0" r="7" fill="#b8663b"/>
+    <text class="map-title" x="16" y="5">Coorg (Kodagu)</text>
+  </g>
+
+  <g transform="translate(500 160)">
+    <circle cx="0" cy="0" r="4.5" fill="#1f3a34"/>
+    <text class="map-label-muted" x="14" y="4">Kushalnagar</text>
+  </g>
+
+  <g transform="translate(520 300)">
+    <circle cx="0" cy="0" r="4.5" fill="#1f3a34"/>
+    <text class="map-label" x="14" y="4">Somwarpet</text>
+  </g>
+
+  <g transform="translate(390 352)">
+    <circle cx="0" cy="0" r="4.5" fill="#1f3a34"/>
+    <text class="map-label" x="14" y="4">Madikeri</text>
+  </g>
+
+  <g transform="translate(250 398)">
+    <circle cx="0" cy="0" r="4.5" fill="#1f3a34"/>
+    <text class="map-label" x="14" y="4">Virajpet</text>
+  </g>
+</svg>

@@ -1,15 +1,33 @@
 @use '@scss/common' as *;
 
 .template {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
   background: var(--brand-ivory, #f8f4ec);
   color: var(--brand-charcoal, #1e2522);
   // Clear the fixed navbar so the first section isn't tucked underneath.
-  // Only applies to Corespace Template pages.
   margin-top: var(--page-padding-top);
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    z-index: -1;
+    width: 100vw;
+    transform: translateX(-50%);
+    top: 0;
+    bottom: 0;
+    background: var(--brand-ivory, #f8f4ec);
+    pointer-events: none;
+  }
 }
 
 .gutter {
   width: 100%;
+  min-width: 0;
 }
 
 .stack {
@@ -19,10 +37,13 @@
   max-width: 1240px;
   margin: 0 auto;
   width: 100%;
+  min-width: 0;
 }
 
 .section {
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .empty {
@@ -67,6 +88,10 @@
 }
 
 @include small-break {
+  .stack {
+    gap: 2.5rem;
+  }
+
   .empty {
     border-radius: 18px;
     padding: 1.5rem;

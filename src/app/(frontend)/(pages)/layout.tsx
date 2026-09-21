@@ -1,3 +1,4 @@
+import { FloatingWhatsApp } from '@components/FloatingWhatsApp/index'
 import { Footer } from '@components/Footer/index'
 import { Header } from '@components/Header/index'
 import { fetchGlobals } from '@data/index'
@@ -23,6 +24,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
       <div>
         {children}
         <Footer {...footer} />
+        <FloatingWhatsApp />
       </div>
     </React.Fragment>
   )

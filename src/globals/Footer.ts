@@ -71,7 +71,13 @@ export const Footer: GlobalConfig = {
           navItems: [
             { link: { type: 'custom', label: 'Portfolio', url: '/projects' } },
             { link: { type: 'custom', label: 'Homestay & Villa', url: '/projects/homestay-villa' } },
-            { link: { type: 'custom', label: 'Coorg Construction', url: '/projects/coorg' } },
+            {
+              link: {
+                type: 'custom',
+                label: 'Coorg Construction',
+                url: '/service/corespace-construction-services-coorg',
+              },
+            },
           ],
         },
         {
@@ -86,6 +92,7 @@ export const Footer: GlobalConfig = {
           navItems: [
             { link: { type: 'custom', label: 'About', url: '/about' } },
             { link: { type: 'custom', label: 'Contact', url: '/contact' } },
+            { link: { type: 'custom', label: 'Thank You', url: '/thank-you' } },
             { link: { type: 'custom', label: 'Privacy', url: '/privacy' } },
             { link: { type: 'custom', label: 'Terms', url: '/terms' } },
           ],
