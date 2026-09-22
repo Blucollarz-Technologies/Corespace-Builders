@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { Banner } from '@root/blocks/Banner'
+import { revalidateTag } from 'next/cache'
 
 import { isAdmin } from '../access/isAdmin'
 
@@ -60,6 +61,13 @@ export const ReusableContent: CollectionConfig = {
       required: true,
     },
   ],
+  hooks: {
+    afterChange: [
+      () => {
+        revalidateTag('posts')
+      },
+    ],
+  },
   labels: {
     plural: 'Reusable Contents',
     singular: 'Reusable Content',

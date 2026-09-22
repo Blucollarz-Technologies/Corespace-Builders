@@ -1,0 +1,196 @@
+@use '@scss/common' as *;
+
+.renovationCost {
+  width: 100%;
+}
+
+.shell {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.5rem, 3vw, 2rem);
+  padding: clamp(2rem, 4vw, 3rem);
+  border-radius: 24px;
+  background: var(--brand-charcoal-forest, #172622);
+  border: 1px solid rgba(200, 184, 154, 0.1);
+  box-shadow: 0 14px 34px rgba(23, 38, 34, 0.22);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-width: 44rem;
+}
+
+.heading {
+  margin: 0;
+  font-family: var(--font-heading), Georgia, serif;
+  font-size: clamp(1.85rem, 3.2vw, 2.75rem);
+  font-weight: 600;
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  color: var(--brand-ivory, #f8f4ec);
+}
+
+.subheading {
+  margin: 0;
+  font-size: clamp(0.98rem, 1.15vw, 1.08rem);
+  line-height: 1.6;
+  color: rgba(248, 244, 236, 0.72);
+}
+
+.cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  min-width: 0;
+  padding: clamp(1.35rem, 2.2vw, 1.75rem);
+  border-radius: 16px;
+  border: 1px solid rgba(200, 184, 154, 0.14);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.cardLabel {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 500;
+  line-height: 1.35;
+  color: rgba(248, 244, 236, 0.88);
+}
+
+.priceRow {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem 0.5rem;
+}
+
+.price {
+  font-family: var(--font-heading), Georgia, serif;
+  font-size: clamp(1.45rem, 2.2vw, 1.85rem);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--brand-ivory, #f8f4ec);
+}
+
+.unit {
+  font-size: 0.92rem;
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--brand-stone, #c8b89a);
+}
+
+.influencers {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.influencersLabel {
+  margin: 0;
+  font-size: 0.96rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--brand-terracotta, #b8663b);
+}
+
+.pills {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.pill {
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid rgba(200, 184, 154, 0.28);
+  background: rgba(255, 255, 255, 0.03);
+  font-size: 0.88rem;
+  font-weight: 500;
+  line-height: 1.3;
+  color: rgba(248, 244, 236, 0.78);
+}
+
+.disclaimer {
+  margin: 0;
+  max-width: 40rem;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: rgba(248, 244, 236, 0.62);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3rem;
+  padding: 0.85rem 1.6rem;
+  border-radius: 999px;
+  background: var(--brand-terracotta, #b8663b) !important;
+  border: 1px solid var(--brand-terracotta, #b8663b) !important;
+  color: #fff !important;
+  font-size: 0.96rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: none !important;
+  box-shadow: 0 10px 24px rgba(184, 102, 59, 0.22);
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease;
+
+  &:hover,
+  &:focus-visible {
+    transform: translateY(-1px);
+    box-shadow: 0 14px 28px rgba(184, 102, 59, 0.28);
+    color: #fff !important;
+    text-decoration: none !important;
+  }
+}
+
+@include small-break {
+  .shell {
+    padding: 1.5rem 1.25rem;
+    border-radius: 18px;
+  }
+
+  .heading {
+    font-size: 1.8rem;
+  }
+
+  .cards {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .card {
+    padding: 1.2rem 1.1rem;
+    border-radius: 14px;
+  }
+
+  .price {
+    font-size: 1.4rem;
+  }
+
+  .cta {
+    width: 100%;
+  }
+}

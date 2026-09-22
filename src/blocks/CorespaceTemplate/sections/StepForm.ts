@@ -1,5 +1,7 @@
 import type { Block } from 'payload'
 
+import { WHATSAPP_LINK } from '@root/utilities/whatsapp'
+
 export const CorespaceStepFormSection: Block = {
   slug: 'corespaceStepForm',
   interfaceName: 'CorespaceStepFormSection',
@@ -29,7 +31,16 @@ export const CorespaceStepFormSection: Block = {
       label: 'Form',
       admin: {
         description:
-          'Select a form created under Forms. Each form field becomes one step in the wizard.',
+          'Select fields become wizard steps. Trailing text, email, textarea, and checkbox fields are grouped as Contact Details on the final step.',
+      },
+    },
+    {
+      name: 'whatsappUrl',
+      type: 'text',
+      defaultValue: WHATSAPP_LINK,
+      label: 'WhatsApp URL (secondary CTA on final step)',
+      admin: {
+        description: 'Full WhatsApp link with optional pre-filled message.',
       },
     },
     {

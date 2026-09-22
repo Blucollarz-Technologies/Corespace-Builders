@@ -1,6 +1,7 @@
 import type { GlobalConfig } from 'payload'
 
 import { revalidatePath, revalidateTag } from 'next/cache'
+import { WHATSAPP_LINK } from '@root/utilities/whatsapp'
 
 import { isAdmin } from '../access/isAdmin'
 import link from '../fields/link'
@@ -281,11 +282,11 @@ export const MainMenu: GlobalConfig = {
         {
           name: 'whatsappUrl',
           type: 'text',
-          defaultValue: 'https://wa.me/',
+          defaultValue: WHATSAPP_LINK,
           label: 'WhatsApp URL',
           admin: {
             condition: (_, siblingData) => Boolean(siblingData?.enableWhatsApp),
-            description: 'Full WhatsApp link, e.g. https://wa.me/919876543210',
+            description: 'Full WhatsApp link with optional pre-filled message.',
           },
         },
       ],

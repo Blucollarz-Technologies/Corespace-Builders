@@ -1,0 +1,138 @@
+@use '@scss/common' as *;
+
+.corePrinciples {
+  width: 100%;
+}
+
+.shell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(1.75rem, 3.5vw, 2.5rem);
+  padding: clamp(2.25rem, 4.5vw, 3.25rem) clamp(1.5rem, 3vw, 2rem);
+  border-radius: 24px;
+  background-color: var(--brand-charcoal-forest, #172622);
+  border: 1px solid rgba(200, 184, 154, 0.1);
+  box-shadow: 0 14px 34px rgba(23, 38, 34, 0.22);
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.85rem;
+  max-width: 40rem;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--brand-terracotta, #b8663b);
+}
+
+.eyebrowDash {
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.heading {
+  margin: 0;
+  font-family: var(--font-heading), Georgia, serif;
+  font-size: clamp(1.85rem, 3.2vw, 2.75rem);
+  font-weight: 600;
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  color: var(--brand-ivory, #f8f4ec);
+}
+
+.subheading {
+  margin: 0;
+  font-size: clamp(0.98rem, 1.15vw, 1.08rem);
+  line-height: 1.55;
+  color: rgba(248, 244, 236, 0.72);
+}
+
+.grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.85rem;
+  min-height: 100%;
+  min-width: 0;
+  padding: clamp(1.35rem, 2.2vw, 1.75rem) clamp(0.85rem, 1.5vw, 1rem);
+  border-radius: 16px;
+  border: 1px solid rgba(200, 184, 154, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  text-align: center;
+}
+
+.number {
+  font-family: var(--font-heading), Georgia, serif;
+  font-size: clamp(1.65rem, 2.4vw, 2rem);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--brand-terracotta, #b8663b);
+}
+
+.label {
+  margin: 0;
+  font-size: clamp(0.9rem, 1.05vw, 0.98rem);
+  font-weight: 500;
+  line-height: 1.4;
+  color: rgba(248, 244, 236, 0.92);
+  overflow-wrap: anywhere;
+}
+
+@include large-break {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@include mid-break {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@include small-break {
+  .shell {
+    padding: 1.5rem 1.15rem;
+    border-radius: 18px;
+  }
+
+  .heading {
+    font-size: 1.8rem;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 0.65rem;
+  }
+
+  .card {
+    padding: 1.2rem 1rem;
+    border-radius: 14px;
+  }
+}

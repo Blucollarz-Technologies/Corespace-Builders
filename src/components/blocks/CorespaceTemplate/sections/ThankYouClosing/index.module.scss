@@ -1,0 +1,89 @@
+@use '@scss/common' as *;
+
+.thankYouClosing {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1rem;
+  max-width: 44rem;
+  margin: 0 auto;
+  padding: clamp(1rem, 3vw, 1.5rem) 0;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--brand-terracotta, #b8663b);
+}
+
+.eyebrowDash {
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.heading {
+  margin: 0;
+  font-family: var(--font-heading), Georgia, serif;
+  font-size: clamp(1.85rem, 3.2vw, 2.75rem);
+  font-weight: 600;
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  color: var(--brand-charcoal, #1e2522);
+}
+
+.copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  max-width: 36rem;
+}
+
+.intro,
+.closing {
+  margin: 0;
+  font-size: clamp(0.98rem, 1.15vw, 1.05rem);
+  line-height: 1.65;
+  color: var(--brand-slate, #5f665f);
+}
+
+.whatsappLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.35rem;
+  font-size: 0.98rem;
+  font-weight: 500;
+  color: #1f8f4e;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+
+  &:hover,
+  &:focus-visible {
+    color: #167a42;
+  }
+}
+
+.whatsappIcon {
+  flex-shrink: 0;
+  color: #8aa08f;
+}
+
+@include small-break {
+  .thankYouClosing {
+    gap: 0.85rem;
+  }
+
+  .heading {
+    font-size: 1.75rem;
+  }
+}

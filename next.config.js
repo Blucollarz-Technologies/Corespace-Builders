@@ -1,6 +1,10 @@
 import { withPayload } from '@payloadcms/next/withPayload'
+import { createRequire } from 'node:module'
 import path from 'path'
 import { fileURLToPath } from 'node:url'
+
+const require = createRequire(import.meta.url)
+const { getNextDistDir, isOneDriveProject } = require('./next-dist-dir.cjs')
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
@@ -37,9 +41,10 @@ const localhost = process.env.NEXT_PUBLIC_IS_LIVE
       },
     ]
 
+const nextDistDir = getNextDistDir()
+
 const nextConfig = withBundleAnalyzer({
-  // Keep Next.js build output out of OneDrive-synced `.next` to avoid EINVAL/readlink crashes.
-  distDir: 'node_modules/.cache/next',
+  distDir: nextDistDir,
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -104,8 +109,14 @@ const nextConfig = withBundleAnalyzer({
       '@graphql': path.resolve(dirname, './src/graphql'),
     },
   },
-  webpack: (config) => {
+  webpack: (config, { dev }) => {
     const configCopy = { ...config }
+
+    // OneDrive breaks webpack's filesystem cache during dev; use in-memory cache instead.
+    if (dev && isOneDriveProject()) {
+      configCopy.cache = { type: 'memory' }
+    }
+
     configCopy.resolve = {
       ...config.resolve,
       extensions: ['.ts', '.tsx', '.js', '.jsx'],

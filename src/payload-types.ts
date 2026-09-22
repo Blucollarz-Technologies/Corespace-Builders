@@ -2494,20 +2494,40 @@ export interface CorespaceTemplateBlock {
     sections?:
       | (
           | CorespaceAboutSection
+          | CorespaceCorePrinciplesSection
           | CorespaceDefinitionSection
           | CorespaceDirectAnswerSection
+          | CorespaceQuickAnswerSection
+          | CorespaceRenovationCostSection
           | CorespaceServicesSection
           | CorespaceProjectsSection
           | CorespaceFeaturedProjectsSection
+          | CorespaceProofOfWorkSection
+          | CorespaceIsThisForYouSection
+          | CorespaceOurDifferenceSection
+          | CorespaceOwnersSection
+          | CorespaceWhoThisIsForSection
+          | CorespaceDecisionFrameworkSection
+          | CorespaceAreasWeServeSection
+          | CorespaceExploreMoreSection
+          | CorespaceRelatedPlanningPagesSection
           | CorespaceProjectGallerySection
           | CorespacePositioningSection
           | CorespaceFaqSection
+          | CorespaceFormSuccessSection
+          | CorespaceCoorgPlanningSection
+          | CorespaceWhileYouWaitSection
+          | CorespaceWhyCorespaceSection
+          | CorespaceThankYouClosingSection
           | CorespaceGetStartedSection
           | CorespaceClientPerspectiveSection
           | CorespaceOurApproachSection
           | CorespaceDesignProcessSection
           | CorespaceCostClaritySection
+          | CorespaceTypicalCostRangesSection
           | CorespaceCommonChallengesSection
+          | CorespaceStrategyCheckSection
+          | CorespaceStartHereSection
           | CorespaceStepFormSection
           | CorespacePlaceholderSection
         )[]
@@ -2581,6 +2601,24 @@ export interface CorespaceAboutSection {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CorespaceCorePrinciplesSection".
+ */
+export interface CorespaceCorePrinciplesSection {
+  eyebrow?: string | null;
+  heading: string;
+  subheading?: string | null;
+  principles?:
+    | {
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'corespaceCorePrinciples';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "CorespaceDefinitionSection".
  */
 export interface CorespaceDefinitionSection {
@@ -2612,6 +2650,81 @@ export interface CorespaceDirectAnswerSection {
   id?: string | null;
   blockName?: string | null;
   blockType: 'corespaceDirectAnswer';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CorespaceQuickAnswerSection".
+ */
+export interface CorespaceQuickAnswerSection {
+  heading: string;
+  body: string;
+  cards?:
+    | {
+        icon: 'check' | 'design' | 'plus' | 'terrain' | 'cost' | 'house';
+        title: string;
+        /**
+         * Optional short line above the checkmarks.
+         */
+        description?: string | null;
+        checkmarks?:
+          | {
+              text: string;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'corespaceQuickAnswer';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CorespaceRenovationCostSection".
+ */
+export interface CorespaceRenovationCostSection {
+  heading: string;
+  subheading?: string | null;
+  costCards?:
+    | {
+        label: string;
+        price: string;
+        unit?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  influencersLabel?: string | null;
+  influencers?:
+    | {
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  disclaimer?: string | null;
+  cta: {
+    type?: ('reference' | 'custom') | null;
+    newTab?: boolean | null;
+    reference?:
+      | ({
+          relationTo: 'pages';
+          value: string | Page;
+        } | null)
+      | ({
+          relationTo: 'posts';
+          value: string | Post;
+        } | null)
+      | ({
+          relationTo: 'case-studies';
+          value: string | CaseStudy;
+        } | null);
+    url?: string | null;
+    label: string;
+    customId?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'corespaceRenovationCost';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2692,36 +2805,274 @@ export interface CorespaceProjectsSection {
  * via the `definition` "CorespaceFeaturedProjectsSection".
  */
 export interface CorespaceFeaturedProjectsSection {
+  /**
+   * Use Carousel on the Home page. Use Showcase on the Projects page for alternating case-study cards.
+   */
+  layout: 'carousel' | 'showcase';
+  /**
+   * Shown only in Showcase layout.
+   */
   eyebrow?: string | null;
   heading: string;
   projects?:
     | {
         image?: (string | null) | Media;
         /**
-         * Highlighted tag, e.g. Residential Home
+         * e.g. RESIDENTIAL HOME
          */
-        primaryTag: string;
-        tags?:
-          | {
-              label: string;
-              id?: string | null;
-            }[]
-          | null;
+        categoryBadge: string;
         title: string;
-        challenge: string;
+        /**
+         * e.g. NEAR MADIKERI
+         */
+        location: string;
+        /**
+         * Carousel: shown as SCOPE. Showcase: shown as a tag pill.
+         */
+        scope?: string | null;
+        /**
+         * Carousel layout only.
+         */
+        description?: string | null;
+        challenge?: string | null;
         approach?:
           | {
               text: string;
               id?: string | null;
             }[]
           | null;
-        outcome: string;
+        outcome?: string | null;
         id?: string | null;
       }[]
     | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'corespaceFeaturedProjects';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CorespaceProofOfWorkSection".
+ */
+export interface CorespaceProofOfWorkSection {
+  eyebrow?: string | null;
+  heading: string;
+  projects?:
+    | {
+        image?: (string | null) | Media;
+        /**
+         * e.g. VILLA DEVELOPMENT
+         */
+        category: string;
+        title: string;
+        /**
+         * e.g. Coorg, Kodagu
+         */
+        location: string;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'corespaceProofOfWork';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CorespaceIsThisForYouSection".
+ */
+export interface CorespaceIsThisForYouSection {
+  eyebrow?: string | null;
+  heading: string;
+  audiences?:
+    | {
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'corespaceIsThisForYou';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CorespaceOurDifferenceSection".
+ */
+export interface CorespaceOurDifferenceSection {
+  eyebrow?: string | null;
+  heading: string;
+  items?:
+    | {
+        label: string;
+        /**
+         * Use for the bottom card that spans both columns on desktop.
+         */
+        spanFull?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  footerNote?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'corespaceOurDifference';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CorespaceOwnersSection".
+ */
+export interface CorespaceOwnersSection {
+  eyebrow?: string | null;
+  heading: string;
+  topDescription?: string | null;
+  topTags?:
+    | {
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  bottomDescription?: string | null;
+  bottomTags?:
+    | {
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  image?: (string | null) | Media;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'corespaceOwners';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CorespaceWhoThisIsForSection".
+ */
+export interface CorespaceWhoThisIsForSection {
+  eyebrow?: string | null;
+  heading: string;
+  description?: string | null;
+  audiences?:
+    | {
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'corespaceWhoThisIsFor';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CorespaceDecisionFrameworkSection".
+ */
+export interface CorespaceDecisionFrameworkSection {
+  eyebrow?: string | null;
+  heading: string;
+  questions?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  calloutPrefix?: string | null;
+  /**
+   * Shown in bold after the prefix.
+   */
+  calloutEmphasis?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'corespaceDecisionFramework';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CorespaceAreasWeServeSection".
+ */
+export interface CorespaceAreasWeServeSection {
+  eyebrow?: string | null;
+  heading: string;
+  /**
+   * Leave empty to use the built-in illustrated map.
+   */
+  mapImage?: (string | null) | Media;
+  areas?:
+    | {
+        title: string;
+        subtitle: string;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'corespaceAreasWeServe';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CorespaceExploreMoreSection".
+ */
+export interface CorespaceExploreMoreSection {
+  eyebrow?: string | null;
+  heading: string;
+  items?:
+    | {
+        cardLink: {
+          type?: ('reference' | 'custom') | null;
+          newTab?: boolean | null;
+          reference?:
+            | ({
+                relationTo: 'pages';
+                value: string | Page;
+              } | null)
+            | ({
+                relationTo: 'posts';
+                value: string | Post;
+              } | null)
+            | ({
+                relationTo: 'case-studies';
+                value: string | CaseStudy;
+              } | null);
+          url?: string | null;
+          label: string;
+          customId?: string | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'corespaceExploreMore';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CorespaceRelatedPlanningPagesSection".
+ */
+export interface CorespaceRelatedPlanningPagesSection {
+  eyebrow?: string | null;
+  heading: string;
+  items?:
+    | {
+        cardLink: {
+          type?: ('reference' | 'custom') | null;
+          newTab?: boolean | null;
+          reference?:
+            | ({
+                relationTo: 'pages';
+                value: string | Page;
+              } | null)
+            | ({
+                relationTo: 'posts';
+                value: string | Post;
+              } | null)
+            | ({
+                relationTo: 'case-studies';
+                value: string | CaseStudy;
+              } | null);
+          url?: string | null;
+          label: string;
+          customId?: string | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'corespaceRelatedPlanningPages';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2783,6 +3134,139 @@ export interface CorespaceFaqSection {
   id?: string | null;
   blockName?: string | null;
   blockType: 'corespaceFaq';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CorespaceFormSuccessSection".
+ */
+export interface CorespaceFormSuccessSection {
+  heading: string;
+  intro: string;
+  listIntro?: string | null;
+  tags?:
+    | {
+        label: string;
+        /**
+         * Must match the Contact form select option value (e.g. home, villa, homestay).
+         */
+        value?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  closing?: string | null;
+  successBadge?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'corespaceFormSuccess';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CorespaceCoorgPlanningSection".
+ */
+export interface CorespaceCoorgPlanningSection {
+  eyebrow?: string | null;
+  heading: string;
+  subheading?: string | null;
+  tags?:
+    | {
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  closing?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'corespaceCoorgPlanning';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CorespaceWhileYouWaitSection".
+ */
+export interface CorespaceWhileYouWaitSection {
+  eyebrow?: string | null;
+  heading: string;
+  resources?:
+    | {
+        title: string;
+        description: string;
+        resourceLink: {
+          type?: ('reference' | 'custom') | null;
+          newTab?: boolean | null;
+          reference?:
+            | ({
+                relationTo: 'pages';
+                value: string | Page;
+              } | null)
+            | ({
+                relationTo: 'posts';
+                value: string | Post;
+              } | null)
+            | ({
+                relationTo: 'case-studies';
+                value: string | CaseStudy;
+              } | null);
+          url?: string | null;
+          label: string;
+          customId?: string | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'corespaceWhileYouWait';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CorespaceWhyCorespaceSection".
+ */
+export interface CorespaceWhyCorespaceSection {
+  eyebrow?: string | null;
+  heading: string;
+  features?:
+    | {
+        icon: 'check' | 'cost' | 'design' | 'coorg' | 'structured';
+        title: string;
+        description: string;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'corespaceWhyCorespace';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CorespaceThankYouClosingSection".
+ */
+export interface CorespaceThankYouClosingSection {
+  eyebrow?: string | null;
+  heading: string;
+  intro?: string | null;
+  closing?: string | null;
+  whatsappLink: {
+    type?: ('reference' | 'custom') | null;
+    newTab?: boolean | null;
+    reference?:
+      | ({
+          relationTo: 'pages';
+          value: string | Page;
+        } | null)
+      | ({
+          relationTo: 'posts';
+          value: string | Post;
+        } | null)
+      | ({
+          relationTo: 'case-studies';
+          value: string | CaseStudy;
+        } | null);
+    url?: string | null;
+    label: string;
+    customId?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'corespaceThankYouClosing';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2994,6 +3478,38 @@ export interface CorespaceCostClaritySection {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CorespaceTypicalCostRangesSection".
+ */
+export interface CorespaceTypicalCostRangesSection {
+  eyebrow?: string | null;
+  heading: string;
+  cards?:
+    | {
+        title: string;
+        /**
+         * e.g. ₹2,000–₹2,800 / sq ft or Project-Specific
+         */
+        price: string;
+        priceVariant?: ('default' | 'accent') | null;
+        /**
+         * e.g. Suitable for: or Depends on:
+         */
+        listLabel?: string | null;
+        items?:
+          | {
+              text: string;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'corespaceTypicalCostRanges';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "CorespaceCommonChallengesSection".
  */
 export interface CorespaceCommonChallengesSection {
@@ -3025,15 +3541,113 @@ export interface CorespaceCommonChallengesSection {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CorespaceStrategyCheckSection".
+ */
+export interface CorespaceStrategyCheckSection {
+  eyebrow?: string | null;
+  heading: string;
+  subheading?: string | null;
+  lifestyleCard: {
+    label: string;
+    title: string;
+    idealFor?:
+      | {
+          text: string;
+          id?: string | null;
+        }[]
+      | null;
+    priorities?:
+      | {
+          text: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  investmentCard: {
+    label: string;
+    title: string;
+    idealFor?:
+      | {
+          text: string;
+          id?: string | null;
+        }[]
+      | null;
+    priorities?:
+      | {
+          text: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  hybridCard: {
+    label: string;
+    title: string;
+    intro?: string | null;
+    items?:
+      | {
+          text: string;
+          id?: string | null;
+        }[]
+      | null;
+    closingNote?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'corespaceStrategyCheck';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CorespaceStartHereSection".
+ */
+export interface CorespaceStartHereSection {
+  eyebrow?: string | null;
+  heading: string;
+  subheading?: string | null;
+  steps?:
+    | {
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  cta: {
+    type?: ('reference' | 'custom') | null;
+    newTab?: boolean | null;
+    reference?:
+      | ({
+          relationTo: 'pages';
+          value: string | Page;
+        } | null)
+      | ({
+          relationTo: 'posts';
+          value: string | Post;
+        } | null)
+      | ({
+          relationTo: 'case-studies';
+          value: string | CaseStudy;
+        } | null);
+    url?: string | null;
+    label: string;
+    customId?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'corespaceStartHere';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "CorespaceStepFormSection".
  */
 export interface CorespaceStepFormSection {
   eyebrow?: string | null;
   heading: string;
   /**
-   * Select a form created under Forms. Each form field becomes one step in the wizard.
+   * Select fields become wizard steps. Trailing text, email, textarea, and checkbox fields are grouped as Contact Details on the final step.
    */
   form: string | Form;
+  /**
+   * Full WhatsApp link with optional pre-filled message.
+   */
+  whatsappUrl?: string | null;
   sidebarTitle?: string | null;
   sidebarBody?: string | null;
   sidebarPoints?:
@@ -4933,7 +5547,7 @@ export interface MainMenu {
   };
   enableWhatsApp?: boolean | null;
   /**
-   * Full WhatsApp link, e.g. https://wa.me/919876543210
+   * Full WhatsApp link with optional pre-filled message.
    */
   whatsappUrl?: string | null;
   updatedAt?: string | null;
