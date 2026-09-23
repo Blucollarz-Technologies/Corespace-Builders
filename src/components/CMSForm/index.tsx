@@ -6,7 +6,13 @@ import { RichText } from '@components/RichText/index'
 import Form from '@forms/Form/index'
 import { CrosshairIcon } from '@root/icons/CrosshairIcon/index'
 import { getCookie } from '@root/utilities/get-cookie'
-import { usePathname, useRouter } from 'next/navigation'
+import {
+  buildTrackingSubmissionData,
+  FORM_SOURCES,
+  mergeSubmissionData,
+  type FormSource,
+} from '@root/utilities/formTracking'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import * as React from 'react'
 import { toast } from 'sonner'
 
@@ -29,7 +35,15 @@ const buildInitialState = (fields) => {
   return state
 }
 
-const RenderForm = ({ form, hiddenFields }: { form: FormType; hiddenFields: string[] }) => {
+const RenderForm = ({
+  form,
+  formSource,
+  hiddenFields,
+}: {
+  form: FormType
+  formSource: FormSource | string
+  hiddenFields: string[]
+}) => {
   const {
     id: formID,
     confirmationMessage,
@@ -50,6 +64,7 @@ const RenderForm = ({ form, hiddenFields }: { form: FormType; hiddenFields: stri
   const router = useRouter()
 
   const pathname = usePathname()
+  const searchParams = useSearchParams()
 
   const onSubmit = React.useCallback(
     ({ data }) => {
@@ -58,10 +73,12 @@ const RenderForm = ({ form, hiddenFields }: { form: FormType; hiddenFields: stri
 
         setIsLoading(true)
 
-        const dataToSend = Object.entries(data).map(([name, value]) => ({
-          field: name,
-          value,
-        }))
+        const trackingFields = buildTrackingSubmissionData({
+          formSource,
+          pathname,
+          search: searchParams?.toString(),
+        })
+        const dataToSend = mergeSubmissionData(data, trackingFields)
 
         try {
           const hubspotCookie = getCookie('hubspotutk')
@@ -125,7 +142,7 @@ const RenderForm = ({ form, hiddenFields }: { form: FormType; hiddenFields: stri
 
       void submitForm()
     },
-    [router, formID, formRedirect, confirmationType, pathname],
+    [router, formID, formRedirect, confirmationType, formSource, pathname, searchParams],
   )
 
   if (!form?.id) {
@@ -190,13 +207,14 @@ const RenderForm = ({ form, hiddenFields }: { form: FormType; hiddenFields: stri
 
 export const CMSForm: React.FC<{
   form?: FormType | null | string
+  formSource?: FormSource | string
   hiddenFields?: string[]
 }> = (props) => {
-  const { form, hiddenFields } = props
+  const { form, formSource = FORM_SOURCES.CONTACT, hiddenFields } = props
 
   if (!form || typeof form === 'string') {
     return null
   }
 
-  return <RenderForm form={form} hiddenFields={hiddenFields ?? []} />
+  return <RenderForm form={form} formSource={formSource} hiddenFields={hiddenFields ?? []} />
 }

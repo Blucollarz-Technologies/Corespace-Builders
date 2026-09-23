@@ -90,6 +90,7 @@ import { PartnerProgram } from './globals/PartnerProgram'
 import { TopBar } from './globals/TopBar'
 import { opsCounterPlugin } from './plugins/opsCounter'
 import redeployWebsite from './scripts/redeployWebsite'
+import { FORM_NOTIFICATION_EMAIL } from './utilities/formTracking'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
@@ -116,6 +117,18 @@ export default buildConfig({
     meta: {
       description:
         'Corespace Builders plans and builds homes, villas, and homestays in Coorg — with clear cost, design, and execution before construction begins.',
+      icons: [
+        {
+          rel: 'icon',
+          type: 'image/svg+xml',
+          url: '/images/favicon.svg',
+        },
+        {
+          rel: 'apple-touch-icon',
+          type: 'image/svg+xml',
+          url: '/images/favicon-light.svg',
+        },
+      ],
       titleSuffix: '- Corespace Builders',
     },
   },
@@ -382,7 +395,7 @@ export default buildConfig({
     ],
   }),
   email: nodemailerAdapter({
-    defaultFromAddress: 'info@payloadcms.com',
+    defaultFromAddress: FORM_NOTIFICATION_EMAIL,
     defaultFromName: 'Corespace Builders',
     ...sendgridConfig,
   }),
@@ -429,6 +442,59 @@ export default buildConfig({
           },
         ],
         hooks: {
+          beforeChange: [
+            ({ data }) => {
+              const usesDynamicRecipient = data?.emails?.some((email) =>
+                email?.emailTo?.includes('{{'),
+              )
+
+              if (usesDynamicRecipient) {
+                return data
+              }
+
+              const defaultEmail = {
+                emailTo: FORM_NOTIFICATION_EMAIL,
+                subject: 'New lead from Corespace Builders',
+                message: {
+                  root: {
+                    type: 'root',
+                    children: [
+                      {
+                        type: 'paragraph',
+                        children: [
+                          {
+                            type: 'text',
+                            text: '{{*:table}}',
+                            version: 1,
+                          },
+                        ],
+                        direction: 'ltr',
+                        format: '',
+                        indent: 0,
+                        version: 1,
+                      },
+                    ],
+                    direction: 'ltr',
+                    format: '',
+                    indent: 0,
+                    version: 1,
+                  },
+                },
+              }
+
+              if (!data?.emails?.length) {
+                data.emails = [defaultEmail]
+                return data
+              }
+
+              data.emails = data.emails.map((email) => ({
+                ...email,
+                emailTo: FORM_NOTIFICATION_EMAIL,
+              }))
+
+              return data
+            },
+          ],
           afterChange: [
             ({ doc }) => {
               revalidateTag(`form-${doc.title}`)
