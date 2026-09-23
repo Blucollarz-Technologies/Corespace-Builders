@@ -8,18 +8,12 @@ import { RichText } from '@components/RichText/index'
 import { ArrowIcon } from '@root/icons/ArrowIcon/index'
 import * as React from 'react'
 
+import { useCostEstimateForm } from '@root/providers/CostEstimateForm/index'
+import { FORM_SOURCES } from '@root/utilities/formTracking'
 import { resolveWhatsAppUrl } from '@root/utilities/whatsapp'
 
 import { BrandLogo } from '../BrandLogo/index'
 import classes from './index.module.scss'
-
-type DesktopNavType = {
-  brandName?: MainMenu['brandName']
-  enableWhatsApp?: MainMenu['enableWhatsApp']
-  logo?: MainMenu['logo']
-  showBrandName?: MainMenu['showBrandName']
-  whatsappUrl?: MainMenu['whatsappUrl']
-} & Pick<MainMenu, 'menuCta' | 'tabs'>
 
 function WhatsAppIcon() {
   return (
@@ -28,6 +22,14 @@ function WhatsAppIcon() {
     </svg>
   )
 }
+
+type DesktopNavType = {
+  brandName?: MainMenu['brandName']
+  enableWhatsApp?: MainMenu['enableWhatsApp']
+  logo?: MainMenu['logo']
+  showBrandName?: MainMenu['showBrandName']
+  whatsappUrl?: MainMenu['whatsappUrl']
+} & Pick<MainMenu, 'menuCta' | 'tabs'>
 
 export const DesktopNav: React.FC<DesktopNavType> = ({
   brandName,
@@ -100,8 +102,10 @@ export const DesktopNav: React.FC<DesktopNavType> = ({
     setBackgroundStyles({ height: '0px' })
   }
 
+  const { form: costEstimateForm, openCostEstimateForm } = useCostEstimateForm()
   const resolvedWhatsAppUrl = resolveWhatsAppUrl(whatsappUrl)
   const showWhatsApp = enableWhatsApp !== false && Boolean(resolvedWhatsAppUrl)
+  const useCostEstimateModal = Boolean(costEstimateForm && menuCta?.label)
 
   return (
     <div className={classes.desktopNav}>
@@ -268,7 +272,17 @@ export const DesktopNav: React.FC<DesktopNavType> = ({
           </nav>
 
           <div className={classes.actions}>
-            {menuCta?.label && <CMSLink {...menuCta} className={classes.cta} />}
+            {useCostEstimateModal ? (
+              <button
+                className={classes.cta}
+                onClick={() => openCostEstimateForm(FORM_SOURCES.COST_ESTIMATE)}
+                type="button"
+              >
+                {menuCta?.label}
+              </button>
+            ) : (
+              menuCta?.label && <CMSLink {...menuCta} className={classes.cta} />
+            )}
             {showWhatsApp && (
               <a
                 aria-label="Chat on WhatsApp"

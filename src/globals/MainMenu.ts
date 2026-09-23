@@ -274,6 +274,16 @@ export const MainMenu: GlobalConfig = {
           },
         }),
         {
+          name: 'costEstimateForm',
+          type: 'relationship',
+          relationTo: 'forms',
+          label: 'Cost estimate multi-step form',
+          admin: {
+            description:
+              'When set, the primary CTA opens this form in a modal instead of navigating away.',
+          },
+        },
+        {
           name: 'enableWhatsApp',
           type: 'checkbox',
           defaultValue: true,

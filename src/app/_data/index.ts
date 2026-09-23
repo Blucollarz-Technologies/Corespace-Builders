@@ -28,7 +28,7 @@ export const fetchGlobals = async (): Promise<{
   const payload = await getPayload({ config })
   const mainMenu = await payload.findGlobal({
     slug: 'main-menu',
-    depth: 1,
+    depth: 2,
   })
   const footer = await payload.findGlobal({
     slug: 'footer',
@@ -245,6 +245,7 @@ export const fetchBlogPost = async (slug: string, category): Promise<Partial<Pos
       publishedOn: true,
       relatedPosts: true,
       title: true,
+      updatedAt: true,
       videoUrl: true,
     },
     where: {
@@ -456,6 +457,64 @@ export const fetchForm = async (name: string): Promise<Form> => {
   })
 
   return data.docs[0]
+}
+
+export const fetchCostEstimateForm = async (): Promise<Form | null> => {
+  const payload = await getPayload({ config })
+  const mainMenu = await payload.findGlobal({
+    slug: 'main-menu',
+    depth: 2,
+  })
+
+  const menuForm = (mainMenu as { costEstimateForm?: Form | string | null }).costEstimateForm
+
+  if (menuForm && typeof menuForm !== 'string') {
+    return menuForm
+  }
+
+  const contactPage = await payload.find({
+    collection: 'pages',
+    depth: 3,
+    limit: 1,
+    where: {
+      slug: {
+        equals: 'contact',
+      },
+    },
+  })
+
+  const layout = contactPage.docs[0]?.layout
+
+  if (Array.isArray(layout)) {
+    for (const block of layout) {
+      const sections = block.blockType === 'corespaceTemplate'
+        ? block.corespaceTemplateFields?.sections
+        : null
+
+      if (!Array.isArray(sections)) {
+        continue
+      }
+
+      for (const section of sections) {
+        if (
+          section.blockType === 'corespaceStepForm' &&
+          section.form &&
+          typeof section.form !== 'string'
+        ) {
+          return section.form
+        }
+      }
+    }
+  }
+
+  const forms = await payload.find({
+    collection: 'forms',
+    depth: 1,
+    limit: 1,
+    sort: 'createdAt',
+  })
+
+  return forms.docs[0] ?? null
 }
 
 /**

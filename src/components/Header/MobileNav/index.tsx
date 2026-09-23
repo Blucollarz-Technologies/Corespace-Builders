@@ -13,6 +13,8 @@ import { usePathname } from 'next/navigation'
 import * as React from 'react'
 
 import { MenuIcon } from '../../../graphics/MenuIcon/index'
+import { useCostEstimateForm } from '@root/providers/CostEstimateForm/index'
+import { FORM_SOURCES } from '@root/utilities/formTracking'
 import { resolveWhatsAppUrl } from '@root/utilities/whatsapp'
 
 import { BrandLogo } from '../BrandLogo/index'
@@ -50,14 +52,16 @@ const MobileNavItems = ({
   tabs?: MainMenu['tabs']
   whatsappUrl?: MainMenu['whatsappUrl']
 }) => {
-  const { openModal } = useModal()
+  const { closeModal, openModal } = useModal()
   const handleOnClick = (index: number) => {
     openModal(subMenuSlug)
     setActiveTab(index)
   }
 
+  const { form: costEstimateForm, openCostEstimateForm } = useCostEstimateForm()
   const resolvedWhatsAppUrl = resolveWhatsAppUrl(whatsappUrl)
   const showWhatsApp = enableWhatsApp !== false && Boolean(resolvedWhatsAppUrl)
+  const useCostEstimateModal = Boolean(costEstimateForm && menuCta?.label)
 
   return (
     <ul className={classes.mobileMenuItems}>
@@ -104,7 +108,20 @@ const MobileNavItems = ({
 
       {(menuCta?.label || showWhatsApp) && (
         <div className={classes.mobileActions}>
-          {menuCta?.label && <CMSLink {...menuCta} className={classes.mobileCta} />}
+          {useCostEstimateModal ? (
+            <button
+              className={classes.mobileCta}
+              onClick={() => {
+                closeModal(modalSlug)
+                openCostEstimateForm(FORM_SOURCES.COST_ESTIMATE)
+              }}
+              type="button"
+            >
+              {menuCta?.label}
+            </button>
+          ) : (
+            menuCta?.label && <CMSLink {...menuCta} className={classes.mobileCta} />
+          )}
           {showWhatsApp && (
             <a
               aria-label="Chat on WhatsApp"

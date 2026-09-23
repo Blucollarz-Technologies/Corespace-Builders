@@ -7,8 +7,13 @@ import { RichText } from '@components/RichText/index'
 import Form from '@forms/Form/index'
 import { useForm, useFormProcessing } from '@forms/Form/context'
 import { getCookie } from '@root/utilities/get-cookie'
+import {
+  buildTrackingSubmissionData,
+  FORM_SOURCES,
+  mergeSubmissionData,
+} from '@root/utilities/formTracking'
 import { resolveWhatsAppUrl } from '@root/utilities/whatsapp'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import React, { useCallback, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -387,22 +392,43 @@ const StepNavigator: React.FC<{
   )
 }
 
-const StepFormInner: React.FC<{
+export type StepFormWizardProps = {
   form: FormType
-  steps: WizardStep[]
+  formSource?: string
+  onSubmitted?: () => void
+  steps?: WizardStep[]
+  variant?: 'modal' | 'page'
   whatsappUrl?: null | string
-}> = ({ form, steps, whatsappUrl }) => {
+}
+
+export const StepFormWizard: React.FC<StepFormWizardProps> = ({
+  form,
+  formSource = FORM_SOURCES.CONTACT,
+  onSubmitted,
+  steps: stepsFromProps,
+  variant = 'page',
+  whatsappUrl,
+}) => {
   const [hasSubmitted, setHasSubmitted] = useState(false)
   const router = useRouter()
   const pathname = usePathname()
+  const searchParams = useSearchParams()
   const initialState = useMemo(() => buildInitialState(form.fields ?? []), [form.fields])
+  const formFields = useMemo(
+    () => (form.fields || []).filter(isSteppableField),
+    [form.fields],
+  )
+  const steps = stepsFromProps ?? buildWizardSteps(formFields)
+  const resolvedWhatsAppUrl = resolveWhatsAppUrl(whatsappUrl)
 
   const onSubmit = useCallback(
     async ({ data }: { data: Record<string, unknown> }) => {
-      const dataToSend = Object.entries(data).map(([name, value]) => ({
-        field: name,
-        value,
-      }))
+      const trackingFields = buildTrackingSubmissionData({
+        formSource,
+        pathname,
+        search: searchParams?.toString(),
+      })
+      const dataToSend = mergeSubmissionData(data, trackingFields)
 
       const hubspotCookie = getCookie('hubspotutk')
       const pageUri = `${process.env.NEXT_PUBLIC_SITE_URL}${pathname}`
@@ -434,6 +460,7 @@ const StepFormInner: React.FC<{
 
       setHasSubmitted(true)
       toast.success('Form submitted successfully!')
+      onSubmitted?.()
 
       if (form.confirmationType === 'redirect' && form.redirect?.url) {
         const url = form.redirect.url
@@ -457,7 +484,17 @@ const StepFormInner: React.FC<{
         }
       }
     },
-    [form.confirmationType, form.id, form.redirect?.url, pathname, router],
+    [
+      form.confirmationType,
+      form.fields,
+      form.id,
+      form.redirect?.url,
+      formSource,
+      onSubmitted,
+      pathname,
+      router,
+      searchParams,
+    ],
   )
 
   if (hasSubmitted && form.confirmationType === 'message') {
@@ -478,8 +515,27 @@ const StepFormInner: React.FC<{
 
   return (
     <Form formId={form.id} initialState={initialState} onSubmit={onSubmit}>
-      <StepNavigator form={form} steps={steps} whatsappUrl={whatsappUrl} />
+      <div className={variant === 'modal' ? classes.modalWizard : undefined}>
+        <StepNavigator form={form} steps={steps} whatsappUrl={resolvedWhatsAppUrl} />
+      </div>
     </Form>
+  )
+}
+
+const StepFormInner: React.FC<{
+  form: FormType
+  formSource?: string
+  steps: WizardStep[]
+  whatsappUrl?: null | string
+}> = ({ form, formSource, steps, whatsappUrl }) => {
+  return (
+    <StepFormWizard
+      form={form}
+      formSource={formSource}
+      steps={steps}
+      variant="page"
+      whatsappUrl={whatsappUrl}
+    />
   )
 }
 
@@ -492,6 +548,7 @@ export const CorespaceStepForm: React.FC<CorespaceStepFormProps> = ({
   sidebarTitle,
   whatsappUrl,
 }) => {
+  const pathname = usePathname()
   const resolvedWhatsAppUrl = resolveWhatsAppUrl(whatsappUrl)
   if (!form || typeof form === 'string') {
     return (
@@ -507,6 +564,7 @@ export const CorespaceStepForm: React.FC<CorespaceStepFormProps> = ({
 
   const formFields = (form.fields || []).filter(isSteppableField)
   const steps = buildWizardSteps(formFields)
+  const formSource = pathname === '/contact' ? FORM_SOURCES.CONTACT : FORM_SOURCES.PAGE
 
   if (!formFields.length) {
     return (
@@ -551,7 +609,12 @@ export const CorespaceStepForm: React.FC<CorespaceStepFormProps> = ({
         </aside>
 
         <div className={classes.formSide}>
-          <StepFormInner form={form} steps={steps} whatsappUrl={resolvedWhatsAppUrl} />
+          <StepFormInner
+            form={form}
+            formSource={formSource}
+            steps={steps}
+            whatsappUrl={resolvedWhatsAppUrl}
+          />
         </div>
       </div>
     </div>

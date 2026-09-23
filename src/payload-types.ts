@@ -5545,6 +5545,10 @@ export interface MainMenu {
     label: string;
     customId?: string | null;
   };
+  /**
+   * When set, the primary CTA opens this form in a modal instead of navigating away.
+   */
+  costEstimateForm?: (string | null) | Form;
   enableWhatsApp?: boolean | null;
   /**
    * Full WhatsApp link with optional pre-filled message.
@@ -5954,6 +5958,7 @@ export interface MainMenuSelect<T extends boolean = true> {
         label?: T;
         customId?: T;
       };
+  costEstimateForm?: T;
   enableWhatsApp?: T;
   whatsappUrl?: T;
   updatedAt?: T;
