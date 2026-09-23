@@ -37,6 +37,11 @@
   flex-shrink: 0;
 }
 
+button.headerCta {
+  @include btnReset;
+  cursor: pointer;
+}
+
 .headerCta {
   display: inline-flex;
   align-items: center;

@@ -125,6 +125,11 @@
   justify-content: center;
 }
 
+button.cta {
+  @include btnReset;
+  cursor: pointer;
+}
+
 .cta {
   display: inline-flex;
   align-items: center;
