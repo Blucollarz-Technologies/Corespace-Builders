@@ -113,6 +113,15 @@
   margin-top: 0.35rem;
 }
 
+button.primaryCta {
+  @include btnReset;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
 .primaryCta {
   border-radius: 999px !important;
   min-height: 52px;
