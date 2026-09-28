@@ -5,6 +5,8 @@ import { useCostEstimateForm } from '@root/providers/CostEstimateForm/index'
 import { FORM_SOURCES, type FormSource } from '@root/utilities/formTracking'
 import React from 'react'
 
+import classes from './index.module.scss'
+
 export type CostEstimateCtaLink = {
   label?: null | string
   newTab?: boolean | null
@@ -35,7 +37,7 @@ export const CostEstimateCta: React.FC<CostEstimateCtaProps> = ({
   if (form) {
     return (
       <button
-        className={className}
+        className={[classes.button, className].filter(Boolean).join(' ')}
         onClick={() => openCostEstimateForm(formSource)}
         type="button"
       >

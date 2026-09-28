@@ -13,8 +13,6 @@ type CostEstimateFormContextValue = {
 
 const CostEstimateFormContext = createContext<CostEstimateFormContextValue | null>(null)
 
-export const COST_ESTIMATE_MODAL_SLUG = 'cost-estimate-form-modal'
-
 export function CostEstimateFormProvider({
   children,
   form,

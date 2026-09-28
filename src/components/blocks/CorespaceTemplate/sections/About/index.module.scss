@@ -108,16 +108,6 @@
   letter-spacing: 0.01em;
 }
 
-button.primaryCta {
-  @include btnReset;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: auto;
-  white-space: nowrap;
-}
-
 .primaryCta {
   background: var(--brand-terracotta, #b8663b) !important;
   border-color: var(--brand-terracotta, #b8663b) !important;

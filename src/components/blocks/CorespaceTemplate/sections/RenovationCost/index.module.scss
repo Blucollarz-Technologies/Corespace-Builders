@@ -138,11 +138,6 @@
   justify-content: flex-start;
 }
 
-button.cta {
-  @include btnReset;
-  cursor: pointer;
-}
-
 .cta {
   display: inline-flex;
   align-items: center;
