@@ -1,6 +1,7 @@
 'use client'
 
-import { CMSLink, type LinkType, type Reference } from '@components/CMSLink/index'
+import { CostEstimateCta } from '@components/CostEstimateCta/index'
+import { type LinkType, type Reference } from '@components/CMSLink/index'
 import React from 'react'
 
 import classes from './index.module.scss'
@@ -78,12 +79,7 @@ export const CorespaceStartHere: React.FC<CorespaceStartHereProps> = ({
 
       {hasCta && (
         <div className={classes.actions}>
-          <CMSLink
-            {...cta}
-            appearance="primary"
-            className={classes.cta}
-            label={cta?.label}
-          />
+          <CostEstimateCta appearance="primary" className={classes.cta} link={cta} />
         </div>
       )}
     </div>

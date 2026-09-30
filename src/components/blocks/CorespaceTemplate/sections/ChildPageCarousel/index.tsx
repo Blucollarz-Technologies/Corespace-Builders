@@ -2,6 +2,7 @@
 
 import type { Media as MediaType } from '@root/payload-types'
 
+import { CostEstimateCta } from '@components/CostEstimateCta/index'
 import { CMSLink } from '@components/CMSLink/index'
 import { Media } from '@components/Media/index'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
@@ -108,7 +109,7 @@ export const ChildPageCarousel: React.FC<ChildPageCarouselProps> = ({
         </div>
 
         <div className={classes.headerActions}>
-          {showCta && <CMSLink {...cta} className={classes.headerCta} />}
+          {showCta && <CostEstimateCta className={classes.headerCta} link={cta} />}
           {showNav && (
             <div className={classes.nav}>
               <button

@@ -1,5 +1,6 @@
 'use client'
 
+import { CostEstimateCta } from '@components/CostEstimateCta/index'
 import { CMSLink } from '@components/CMSLink/index'
 import React from 'react'
 
@@ -64,11 +65,10 @@ export const CorespaceGetStarted: React.FC<CorespaceGetStartedProps> = ({
         {(hasPrimary || hasSecondary) && (
           <div className={classes.actions}>
             {hasPrimary && (
-              <CMSLink
-                {...primaryCta}
+              <CostEstimateCta
                 appearance="primary"
                 className={classes.primaryCta}
-                label={primaryCta?.label}
+                link={primaryCta}
               />
             )}
             {hasSecondary && (

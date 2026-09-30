@@ -1,5 +1,6 @@
 'use client'
 
+import { CostEstimateCta } from '@components/CostEstimateCta/index'
 import { CMSLink } from '@components/CMSLink/index'
 import React from 'react'
 
@@ -91,11 +92,10 @@ export const CorespaceCostClarity: React.FC<CorespaceCostClarityProps> = ({
           {(hasPrimary || hasSecondary) && (
             <div className={classes.actions}>
               {hasPrimary && (
-                <CMSLink
-                  {...primaryCta}
+                <CostEstimateCta
                   appearance="primary"
                   className={classes.primaryCta}
-                  label={primaryCta?.label}
+                  link={primaryCta}
                 />
               )}
               {hasSecondary && (

@@ -1,6 +1,7 @@
 export const FORM_NOTIFICATION_EMAIL = 'corespacebuilders@gmail.com'
 
 export const FORM_SOURCES = {
+  CONSULTATION_PLAN: 'Consultation Plan',
   CONTACT: 'Contact',
   COST_ESTIMATE: 'Cost Estimate',
   PAGE: 'Page',

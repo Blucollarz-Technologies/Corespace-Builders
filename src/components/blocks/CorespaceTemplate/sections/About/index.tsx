@@ -2,7 +2,9 @@
 
 import type { Media as MediaType } from '@root/payload-types'
 
+import { CostEstimateCta } from '@components/CostEstimateCta/index'
 import { CMSLink, type LinkType, type Reference } from '@components/CMSLink/index'
+import { FORM_SOURCES } from '@root/utilities/formTracking'
 import { Media } from '@components/Media/index'
 import React from 'react'
 
@@ -86,11 +88,11 @@ export const CorespaceAbout: React.FC<CorespaceAboutProps> = ({
         {(hasPrimary || hasSecondary) && (
           <div className={classes.actions}>
             {hasPrimary && (
-              <CMSLink
-                {...primaryCta}
+              <CostEstimateCta
                 appearance="primary"
                 className={classes.primaryCta}
-                label={primaryCta?.label}
+                formSource={FORM_SOURCES.CONSULTATION_PLAN}
+                link={primaryCta}
               />
             )}
             {hasSecondary && (
