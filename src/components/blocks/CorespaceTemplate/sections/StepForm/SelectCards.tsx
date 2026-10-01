@@ -13,6 +13,7 @@ type Option = {
 type SelectCardsProps = {
   label?: null | string
   name?: string
+  onSelect?: (value: string) => void
   options?: Option[] | null
   path?: string
   required?: boolean | null
@@ -21,16 +22,17 @@ type SelectCardsProps = {
 export const SelectCards: React.FC<SelectCardsProps> = ({
   label,
   name,
+  onSelect,
   options,
   path: pathFromProps,
-  required,
+  required = true,
 }) => {
   const path = pathFromProps || name || ''
 
   const validate = useCallback(
     (value: string) => {
       if (required && !value) {
-        return 'Please select an option.'
+        return 'Please select an option to continue.'
       }
       return true
     },
@@ -39,7 +41,7 @@ export const SelectCards: React.FC<SelectCardsProps> = ({
 
   const { errorMessage, setValue, showError, value } = useFormField<string>({
     path,
-    required,
+    required: Boolean(required),
     validate,
   })
 
@@ -57,7 +59,10 @@ export const SelectCards: React.FC<SelectCardsProps> = ({
                 .filter(Boolean)
                 .join(' ')}
               key={option.value}
-              onClick={() => setValue(option.value)}
+              onClick={() => {
+                setValue(option.value)
+                onSelect?.(option.value)
+              }}
               role="radio"
               type="button"
             >

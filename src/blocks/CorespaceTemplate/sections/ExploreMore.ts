@@ -40,42 +40,42 @@ export const CorespaceExploreMoreSection: Block = {
           cardLink: {
             type: 'custom',
             label: 'Construction Services',
-            url: '/service/construction',
+            url: '/service/construction-karnataka',
           },
         },
         {
           cardLink: {
             type: 'custom',
             label: 'Architecture Design',
-            url: '/service/architecture',
+            url: '/service/architecture-design-karnataka',
           },
         },
         {
           cardLink: {
             type: 'custom',
             label: 'Interior Design',
-            url: '/service/interiors',
+            url: '/service/interior-design-services-karnataka',
           },
         },
         {
           cardLink: {
             type: 'custom',
             label: 'Home Renovation',
-            url: '/service/renovation',
+            url: '/service/home-renovation-karnataka',
           },
         },
         {
           cardLink: {
             type: 'custom',
             label: 'Homestay Development',
-            url: '/projects/homestay-villa',
+            url: '/homestay-and-villa-development',
           },
         },
         {
           cardLink: {
             type: 'custom',
             label: 'Construction Cost Guide',
-            url: '/resources/cost-guide',
+            url: '/cost-guide',
           },
         },
       ],

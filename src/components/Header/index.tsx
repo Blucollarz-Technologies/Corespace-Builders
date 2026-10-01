@@ -54,7 +54,7 @@ export const Header: React.FC<
           enableWhatsApp={enableWhatsApp}
           logo={logo}
           menuCta={menuCta}
-          showBrandName={false}
+          showBrandName={true}
           tabs={tabs}
           whatsappUrl={whatsappUrl}
         />
@@ -63,7 +63,7 @@ export const Header: React.FC<
           enableWhatsApp={enableWhatsApp}
           logo={logo}
           menuCta={menuCta}
-          showBrandName={false}
+          showBrandName={true}
           tabs={tabs}
           whatsappUrl={whatsappUrl}
         />

@@ -1,6 +1,7 @@
 'use client'
 
 import { CMSLink, type LinkType, type Reference } from '@components/CMSLink/index'
+import { withResolvedCorespaceUrl } from '@root/utilities/resolveCorespaceUrl'
 import React from 'react'
 
 import classes from './index.module.scss'
@@ -56,7 +57,8 @@ export const CorespaceRelatedPlanningPages: React.FC<CorespaceRelatedPlanningPag
       {linkItems.length > 0 && (
         <ul className={classes.grid}>
           {linkItems.map((item, index) => {
-            const { label, ...linkProps } = item.cardLink ?? {}
+            const resolvedLink = withResolvedCorespaceUrl(item.cardLink)
+            const { label, ...linkProps } = resolvedLink ?? {}
             const cardLabel = label || 'Learn more'
 
             return (

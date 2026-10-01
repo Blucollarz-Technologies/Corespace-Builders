@@ -66,7 +66,16 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
       ) : (
         <DefaultMark />
       )}
-      {showBrandName === true && <span className={classes.brandName}>{name}</span>}
+      {showBrandName === true && !hasUploadedLogo && (
+        <span className={classes.brandName}>
+          <span className={classes.brandNamePrimary}>
+            {name.split(' ')[0] || 'Corespace'}
+          </span>
+          <span className={classes.brandNameSecondary}>
+            {name.split(' ').slice(1).join(' ') || 'Builders'}
+          </span>
+        </span>
+      )}
     </Link>
   )
 }

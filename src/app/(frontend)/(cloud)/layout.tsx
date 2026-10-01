@@ -3,11 +3,13 @@ import type { Metadata } from 'next'
 import { CloudFooter } from '@cloud/_components/CloudFooter/index'
 import { CloudHeader } from '@cloud/_components/CloudHeader/index'
 import { fetchGlobals } from '@data'
+import { brandMetadata } from '@root/utilities/brand'
 import { mergeOpenGraph } from '@root/seo/mergeOpenGraph'
 
 import classes from './layout.module.scss'
 
 export const metadata: Metadata = {
+  ...brandMetadata,
   title: {
     default: 'Corespace Builders',
     template: '%s | Corespace Builders',

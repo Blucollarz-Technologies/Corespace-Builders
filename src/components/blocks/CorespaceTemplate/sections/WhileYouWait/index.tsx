@@ -1,6 +1,7 @@
 'use client'
 
 import { CMSLink, type LinkType, type Reference } from '@components/CMSLink/index'
+import { withResolvedCorespaceUrl } from '@root/utilities/resolveCorespaceUrl'
 import React from 'react'
 
 import classes from './index.module.scss'
@@ -56,8 +57,9 @@ export const CorespaceWhileYouWait: React.FC<CorespaceWhileYouWaitProps> = ({
       {hasResources && (
         <ul className={classes.grid}>
           {resources!.map((resource, index) => {
-            const href = resource.resourceLink?.url
-            const hasLink = Boolean(href || resource.resourceLink?.reference)
+            const resolvedLink = withResolvedCorespaceUrl(resource.resourceLink)
+            const href = resolvedLink?.url
+            const hasLink = Boolean(href || resolvedLink?.reference)
 
             const cardContent = (
               <>
@@ -71,7 +73,7 @@ export const CorespaceWhileYouWait: React.FC<CorespaceWhileYouWaitProps> = ({
               </>
             )
 
-            const { label: _linkLabel, ...linkProps } = resource.resourceLink ?? {}
+            const { label: _linkLabel, ...linkProps } = resolvedLink ?? {}
 
             return (
               <li className={classes.cardItem} key={resource.id ?? `${resource.title}-${index}`}>

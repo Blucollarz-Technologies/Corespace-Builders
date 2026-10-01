@@ -3282,6 +3282,9 @@ export interface CorespaceGetStartedSection {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Optional. Leave empty to hide. e.g. Chat on WhatsApp (Thank You page).
+   */
   primaryCta: {
     type?: ('reference' | 'custom') | null;
     newTab?: boolean | null;
@@ -3302,6 +3305,9 @@ export interface CorespaceGetStartedSection {
     label: string;
     customId?: string | null;
   };
+  /**
+   * Optional. Leave empty to hide. e.g. WhatsApp Us (Home) — clear this on Thank You.
+   */
   secondaryCta: {
     type?: ('reference' | 'custom') | null;
     newTab?: boolean | null;
@@ -3423,27 +3429,10 @@ export interface CorespaceCostClaritySection {
   heading: string;
   body?: string | null;
   planningNote?: string | null;
+  /**
+   * e.g. Get Your Estimate — opens the cost estimate multi-step form modal when Main Menu form is set.
+   */
   primaryCta: {
-    type?: ('reference' | 'custom') | null;
-    newTab?: boolean | null;
-    reference?:
-      | ({
-          relationTo: 'pages';
-          value: string | Page;
-        } | null)
-      | ({
-          relationTo: 'posts';
-          value: string | Post;
-        } | null)
-      | ({
-          relationTo: 'case-studies';
-          value: string | CaseStudy;
-        } | null);
-    url?: string | null;
-    label: string;
-    customId?: string | null;
-  };
-  secondaryCta: {
     type?: ('reference' | 'custom') | null;
     newTab?: boolean | null;
     reference?:

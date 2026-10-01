@@ -40,35 +40,35 @@ export const CorespaceRelatedPlanningPagesSection: Block = {
           cardLink: {
             type: 'custom',
             label: 'Architecture Design Services',
-            url: '/service/architecture',
+            url: '/service/architecture-design-karnataka',
           },
         },
         {
           cardLink: {
             type: 'custom',
             label: 'Interior Design Services',
-            url: '/service/interiors',
+            url: '/service/interior-design-services-karnataka',
           },
         },
         {
           cardLink: {
             type: 'custom',
             label: 'Home Renovation Services',
-            url: '/service/renovation',
+            url: '/service/home-renovation-karnataka',
           },
         },
         {
           cardLink: {
             type: 'custom',
             label: 'Homestay & Villa Development',
-            url: '/projects/homestay-villa',
+            url: '/homestay-and-villa-development',
           },
         },
         {
           cardLink: {
             type: 'custom',
             label: 'Construction Cost in Karnataka',
-            url: '/resources/cost-guide',
+            url: '/cost-guide',
           },
         },
         {

@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 
-import BreadcrumbsBar from '@components/Hero/BreadcrumbsBar/index'
 import { PayloadRedirects } from '@components/PayloadRedirects/index'
 import { Post } from '@components/Post/index'
 import { RefreshRouteOnSave } from '@components/RefreshRouterOnSave/index'
@@ -43,7 +42,6 @@ const PostPage = async ({
     <>
       <PayloadRedirects disableNotFound url={url} />
       <RefreshRouteOnSave />
-      <BreadcrumbsBar breadcrumbs={[]} hero={{ type: 'default' }} />
       <Post {...blogPost} />
     </>
   )

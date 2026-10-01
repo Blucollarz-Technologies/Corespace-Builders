@@ -63,6 +63,8 @@ export const CorespaceGetStartedSection: Block = {
             label: 'Primary CTA',
             admin: {
               width: '50%',
+              description:
+                'Optional. Leave empty to hide. e.g. Chat on WhatsApp (Thank You page).',
             },
           },
         }),
@@ -73,6 +75,8 @@ export const CorespaceGetStartedSection: Block = {
             label: 'Secondary CTA',
             admin: {
               width: '50%',
+              description:
+                'Optional. Leave empty to hide. e.g. WhatsApp Us (Home) — clear this on Thank You.',
             },
           },
         }),

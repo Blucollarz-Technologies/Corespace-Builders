@@ -132,19 +132,6 @@
   }
 }
 
-.secondaryCta {
-  color: rgba(248, 244, 236, 0.92) !important;
-  font-size: 0.98rem !important;
-  font-weight: 500 !important;
-  text-decoration: none !important;
-
-  &:hover,
-  &:focus-visible {
-    color: #fff !important;
-    text-decoration: underline !important;
-  }
-}
-
 .card {
   position: relative;
   display: flex;
@@ -258,10 +245,6 @@
   .primaryCta {
     width: 100%;
     justify-content: center;
-  }
-
-  .secondaryCta {
-    text-align: center;
   }
 
   .card {
