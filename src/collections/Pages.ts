@@ -7,6 +7,7 @@ import { publishedOnly } from '../access/publishedOnly'
 import { fullTitle } from '../fields/fullTitle'
 import { hero } from '../fields/hero'
 import { slugField } from '../fields/slug'
+import { formatPagePath } from '../utilities/formatPagePath'
 import { formatPreviewURL } from '../utilities/formatPreviewURL'
 
 export const Pages: CollectionConfig = {
@@ -100,14 +101,11 @@ export const Pages: CollectionConfig = {
     afterChange: [
       ({ doc, previousDoc }) => {
         if (doc._status === 'published' || doc._status !== previousDoc._status) {
-          const path =
-            doc.breadcrumbs && doc.breadcrumbs.length > 0
-              ? doc.breadcrumbs[doc.breadcrumbs.length - 1].url
-              : `/${doc.slug}`
+          const path = formatPagePath('pages', doc) || '/'
           const tagKey =
             doc.slug === 'home'
               ? 'home'
-              : (path || `/${doc.slug}`).replace(/^\/|\/$/g, '') || 'home'
+              : path.replace(/^\/|\/$/g, '') || 'home'
 
           revalidateTag('pages')
           revalidateTag(`page_${tagKey}`)

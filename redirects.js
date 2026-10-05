@@ -14,6 +14,12 @@ export const redirects = async () => {
       permanent: true,
     },
     {
+      // Homepage CMS slug must not remain a duplicate indexable URL
+      source: '/home',
+      destination: '/',
+      permanent: true,
+    },
+    {
       source: '/services/:slug',
       destination: '/service/:slug',
       permanent: true,

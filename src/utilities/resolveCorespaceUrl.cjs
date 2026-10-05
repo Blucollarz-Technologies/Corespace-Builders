@@ -1,14 +1,8 @@
 /**
- * Canonical public URLs for Corespace.
- *
- * Accepted routes:
- * - Homepage: `/` (not `/home`)
- * - Services: `/service/{slug}` (not `/services/{slug}`)
- * - Projects: `/project/{slug}` (not `/projects/{slug}`)
- * - Listings stay plural: `/services`, `/projects`
+ * CommonJS twin of resolveCorespaceUrl.ts for Node scripts (redirects / permalink).
  */
 
-const CORESPACE_URL_ALIASES: Record<string, string> = {
+const CORESPACE_URL_ALIASES = {
   '/home': '/',
   '/service/architecture': '/service/architecture-design-karnataka',
   '/service/interiors': '/service/interior-design-services-karnataka',
@@ -18,13 +12,12 @@ const CORESPACE_URL_ALIASES: Record<string, string> = {
   '/resources/cost-guide': '/cost-guide',
 }
 
-function normalizePath(url: string): string {
-  const trimmed = url.trim()
+function normalizePath(url) {
+  const trimmed = String(url || '').trim()
   if (!trimmed) {
     return trimmed
   }
 
-  // Absolute same-site URLs → path only
   try {
     if (/^https?:\/\//i.test(trimmed)) {
       const parsed = new URL(trimmed)
@@ -37,10 +30,7 @@ function normalizePath(url: string): string {
   return trimmed.length > 1 ? trimmed.replace(/\/$/, '') : trimmed
 }
 
-/**
- * Rewrite legacy / duplicate paths to the single public canonical path.
- */
-export function resolveCorespaceUrl(url?: null | string): null | string | undefined {
+function resolveCorespaceUrl(url) {
   if (url == null) {
     return url
   }
@@ -54,12 +44,10 @@ export function resolveCorespaceUrl(url?: null | string): null | string | undefi
     return CORESPACE_URL_ALIASES[path]
   }
 
-  // /services/{slug} → /service/{slug}  (keep /services listing)
   if (path.startsWith('/services/')) {
     return `/service/${path.slice('/services/'.length)}`
   }
 
-  // /projects/{slug} → /project/{slug}  (keep /projects listing)
   if (path.startsWith('/projects/')) {
     return `/project/${path.slice('/projects/'.length)}`
   }
@@ -67,19 +55,6 @@ export function resolveCorespaceUrl(url?: null | string): null | string | undefi
   return path
 }
 
-export function withResolvedCorespaceUrl<T extends { url?: null | string }>(
-  link: T | null | undefined,
-): T | null | undefined {
-  if (!link) {
-    return link
-  }
-
-  if (link.url == null) {
-    return link
-  }
-
-  return {
-    ...link,
-    url: resolveCorespaceUrl(link.url),
-  }
+module.exports = {
+  resolveCorespaceUrl,
 }

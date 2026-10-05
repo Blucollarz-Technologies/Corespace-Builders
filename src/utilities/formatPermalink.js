@@ -1,5 +1,8 @@
 // cannot use ts here, for nodejs sitemap and redirects module
-// this means we have to send through the 'currentCategory' which is a url param not accessible within node
+import { createRequire } from 'node:module'
+
+const require = createRequire(import.meta.url)
+const { resolveCorespaceUrl } = require('./resolveCorespaceUrl.cjs')
 
 export const formatPermalink = (reference) => {
   let permalink = ''
@@ -11,11 +14,13 @@ export const formatPermalink = (reference) => {
 
     // pages could be nested, so use breadcrumbs
     if (relationTo === 'pages') {
-      if (breadcrumbs) {
+      if (referenceSlug === 'home') {
+        permalink = '/'
+      } else if (breadcrumbs) {
         const { url: lastCrumbURL = '' } = breadcrumbs?.[breadcrumbs.length - 1] || {} // last crumb
         permalink = lastCrumbURL
       } else {
-        permalink = referenceSlug
+        permalink = `/${referenceSlug}`
       }
     }
 
@@ -28,5 +33,5 @@ export const formatPermalink = (reference) => {
     }
   }
 
-  return permalink
+  return resolveCorespaceUrl(permalink) || permalink
 }

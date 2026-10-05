@@ -1,5 +1,6 @@
 import type { CaseStudy, Page, Post } from '@root/payload-types'
 
+import { resolveCorespaceUrl } from '@root/utilities/resolveCorespaceUrl'
 import Link from 'next/link'
 import React from 'react'
 // eslint-disable-next-line import/no-cycle
@@ -55,32 +56,32 @@ type GenerateSlugType = {
 const generateHref = (args: GenerateSlugType): string => {
   const { type, reference, url } = args
 
-  if ((type === 'custom' || type === undefined) && url) {
-    return url
-  }
+  let href = ''
 
-  if (type === 'reference' && reference?.value && typeof reference.value !== 'string') {
+  if ((type === 'custom' || type === undefined) && url) {
+    href = url
+  } else if (type === 'reference' && reference?.value && typeof reference.value !== 'string') {
     if (reference.relationTo === 'pages') {
       const value = reference.value as Page
       const breadcrumbs = value?.breadcrumbs
       const hasBreadcrumbs = breadcrumbs && Array.isArray(breadcrumbs) && breadcrumbs.length > 0
       if (hasBreadcrumbs) {
-        return breadcrumbs[breadcrumbs.length - 1]?.url as string
+        href = breadcrumbs[breadcrumbs.length - 1]?.url as string
+      } else if (value.slug === 'home') {
+        href = '/'
+      } else if (value.slug) {
+        href = `/${value.slug}`
       }
+    } else if (reference.relationTo === 'posts') {
+      href = `/blog/${reference.value.slug}`
+    } else if (reference.relationTo === 'case_studies') {
+      href = `/case-studies/${reference.value.slug}`
+    } else {
+      href = `/${reference.relationTo}/${reference.value.slug}`
     }
-
-    if (reference.relationTo === 'posts') {
-      return `/blog/${reference.value.slug}`
-    }
-
-    if (reference.relationTo === 'case_studies') {
-      return `/case-studies/${reference.value.slug}`
-    }
-
-    return `/${reference.relationTo}/${reference.value.slug}`
   }
 
-  return ''
+  return resolveCorespaceUrl(href) || ''
 }
 
 export const CMSLink: React.FC<CMSLinkType> = ({

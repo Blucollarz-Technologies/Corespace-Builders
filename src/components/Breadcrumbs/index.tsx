@@ -1,4 +1,5 @@
 import { EdgeScroll } from '@components/EdgeScroll/index'
+import { resolveCorespaceUrl } from '@root/utilities/resolveCorespaceUrl'
 import Link from 'next/link'
 import * as React from 'react'
 
@@ -27,6 +28,7 @@ export const Breadcrumbs: React.FC<Props> = ({ className, ellipsis = true, items
           ellipsis && typeof item.label === 'string' && (item?.label || '')?.length > 8 && !isLast
 
         if (item?.url && typeof item.url === 'string') {
+          const href = resolveCorespaceUrl(item.url) || item.url
           return (
             <React.Fragment key={index}>
               <div
@@ -34,7 +36,7 @@ export const Breadcrumbs: React.FC<Props> = ({ className, ellipsis = true, items
                   .filter(Boolean)
                   .join(' ')}
               >
-                <Link className={classes.labelContent} href={item.url} prefetch={false}>
+                <Link className={classes.labelContent} href={href} prefetch={false}>
                   {item.label}
                 </Link>
               </div>

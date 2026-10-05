@@ -145,8 +145,12 @@ export async function generateMetadata({
   }
 
   const noIndexMeta = page?.noindex ? { robots: 'noindex' } : {}
+  const canonicalPath = `/project/${slug}`
 
   return {
+    alternates: {
+      canonical: canonicalPath,
+    },
     description: page?.meta?.description,
     openGraph: mergeOpenGraph({
       description: page?.meta?.description ?? undefined,
@@ -158,7 +162,7 @@ export async function generateMetadata({
           ]
         : undefined,
       title: page?.meta?.title || page?.title || 'Project',
-      url: `/project/${slug}`,
+      url: canonicalPath,
     }),
     title: page?.meta?.title || page?.title || 'Project',
     ...noIndexMeta,

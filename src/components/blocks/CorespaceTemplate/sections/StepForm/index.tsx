@@ -3,7 +3,6 @@
 import type { Form as FormType } from '@root/payload-types'
 
 import { fields as cmsFields } from '@components/CMSForm/fields'
-import { RichText } from '@components/RichText/index'
 import Form from '@forms/Form/index'
 import { useForm, useFormProcessing } from '@forms/Form/context'
 import { getCookie } from '@root/utilities/get-cookie'
@@ -11,7 +10,9 @@ import {
   buildTrackingSubmissionData,
   FORM_SOURCES,
   mergeSubmissionData,
+  resolveFormThankYouPath,
 } from '@root/utilities/formTracking'
+import { useCostEstimateForm } from '@root/providers/CostEstimateForm/index'
 import { resolveWhatsAppUrl } from '@root/utilities/whatsapp'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import React, { useCallback, useMemo, useState } from 'react'
@@ -548,53 +549,30 @@ export const StepFormWizard: React.FC<StepFormWizardProps> = ({
       toast.success('Form submitted successfully!')
       onSubmitted?.()
 
-      if (form.confirmationType === 'redirect' && form.redirect?.url) {
-        const url = form.redirect.url
-        const redirectUrl = new URL(url, process.env.NEXT_PUBLIC_SITE_URL)
-        const firstSelect = form.fields?.find(
-          (field) => field.blockType === 'select' && 'name' in field,
-        )
+      // Always land on thank-you (CMS redirect preferred, else /thank-you)
+      const thankYouPath = resolveFormThankYouPath(form.redirect?.url)
+      const redirectUrl = new URL(thankYouPath, process.env.NEXT_PUBLIC_SITE_URL || window.location.origin)
+      const firstSelect = form.fields?.find(
+        (field) => field.blockType === 'select' && 'name' in field,
+      )
 
-        if (firstSelect && 'name' in firstSelect) {
-          const submittedValue = data[firstSelect.name]
+      if (firstSelect && 'name' in firstSelect) {
+        const submittedValue = data[firstSelect.name]
 
-          if (submittedValue) {
-            redirectUrl.searchParams.set('project', String(submittedValue))
-          }
-        }
-
-        if (url.startsWith('/') || redirectUrl.origin === process.env.NEXT_PUBLIC_SITE_URL) {
-          router.push(`${redirectUrl.pathname}${redirectUrl.search}`)
-        } else {
-          window.location.assign(redirectUrl.href)
+        if (submittedValue) {
+          redirectUrl.searchParams.set('project', String(submittedValue))
         }
       }
-    },
-    [
-      form.confirmationType,
-      form.fields,
-      form.id,
-      form.redirect?.url,
-      formSource,
-      onSubmitted,
-      pathname,
-      router,
-      searchParams,
-    ],
-  )
 
-  if (hasSubmitted && form.confirmationType === 'message') {
-    return (
-      <div className={classes.confirmation}>
-        <RichText content={form.confirmationMessage} />
-      </div>
-    )
-  }
+      router.push(`${redirectUrl.pathname}${redirectUrl.search}`)
+    },
+    [form.fields, form.id, form.redirect?.url, formSource, onSubmitted, pathname, router, searchParams],
+  )
 
   if (hasSubmitted) {
     return (
       <div className={classes.confirmation}>
-        <p>Thank you — we received your enquiry.</p>
+        <p>Thank you — redirecting…</p>
       </div>
     )
   }
@@ -635,20 +613,28 @@ export const CorespaceStepForm: React.FC<CorespaceStepFormProps> = ({
   whatsappUrl,
 }) => {
   const pathname = usePathname()
+  const { form: masterForm } = useCostEstimateForm()
   const resolvedWhatsAppUrl = resolveWhatsAppUrl(whatsappUrl)
-  if (!form || typeof form === 'string') {
+
+  // Prefer the site-wide master lead form (Main Menu) so Contact matches modal CTAs
+  const activeForm =
+    masterForm || (form && typeof form !== 'string' ? form : null)
+
+  if (!activeForm) {
     return (
       <div className={classes.stepForm}>
         <div className={classes.header}>
           {eyebrow && <p className={classes.eyebrow}>{eyebrow}</p>}
           {heading && <h2 className={classes.heading}>{heading}</h2>}
         </div>
-        <p className={classes.empty}>Select a form in the CMS to display this step form.</p>
+        <p className={classes.empty}>
+          Select the master lead form in Main Menu → Cost estimate multi-step form.
+        </p>
       </div>
     )
   }
 
-  const formFields = (form.fields || []).filter(isSteppableField)
+  const formFields = (activeForm.fields || []).filter(isSteppableField)
   const steps = buildWizardSteps(formFields)
   const formSource = pathname === '/contact' ? FORM_SOURCES.CONTACT : FORM_SOURCES.PAGE
 
@@ -696,7 +682,7 @@ export const CorespaceStepForm: React.FC<CorespaceStepFormProps> = ({
 
         <div className={classes.formSide}>
           <StepFormInner
-            form={form}
+            form={activeForm}
             formSource={formSource}
             steps={steps}
             whatsappUrl={resolvedWhatsAppUrl}
