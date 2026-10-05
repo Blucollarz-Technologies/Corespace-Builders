@@ -60,17 +60,41 @@ export const Footer: GlobalConfig = {
         {
           label: 'SERVICES',
           navItems: [
-            { link: { type: 'custom', label: 'Construction', url: '/service/construction' } },
-            { link: { type: 'custom', label: 'Architecture', url: '/service/architecture' } },
-            { link: { type: 'custom', label: 'Interiors', url: '/service/interiors' } },
-            { link: { type: 'custom', label: 'Renovation', url: '/service/renovation' } },
+            { link: { type: 'custom', label: 'Construction', url: '/service/construction-karnataka' } },
+            {
+              link: {
+                type: 'custom',
+                label: 'Architecture',
+                url: '/service/architecture-design-karnataka',
+              },
+            },
+            {
+              link: {
+                type: 'custom',
+                label: 'Interiors',
+                url: '/service/interior-design-services-karnataka',
+              },
+            },
+            {
+              link: {
+                type: 'custom',
+                label: 'Renovation',
+                url: '/service/home-renovation-karnataka',
+              },
+            },
           ],
         },
         {
           label: 'PROJECTS',
           navItems: [
             { link: { type: 'custom', label: 'Portfolio', url: '/projects' } },
-            { link: { type: 'custom', label: 'Homestay & Villa', url: '/projects/homestay-villa' } },
+            {
+              link: {
+                type: 'custom',
+                label: 'Homestay & Villa',
+                url: '/homestay-and-villa-development',
+              },
+            },
             {
               link: {
                 type: 'custom',
@@ -83,7 +107,7 @@ export const Footer: GlobalConfig = {
         {
           label: 'RESOURCES',
           navItems: [
-            { link: { type: 'custom', label: 'Cost Guide', url: '/resources/cost-guide' } },
+            { link: { type: 'custom', label: 'Cost Guide', url: '/cost-guide' } },
             { link: { type: 'custom', label: 'Blog', url: '/blog' } },
           ],
         },

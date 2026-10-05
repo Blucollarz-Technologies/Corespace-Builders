@@ -22,8 +22,10 @@ import {
   layoutNeedsServiceCards,
   mapPageToServiceCard,
 } from '@root/utilities/serviceCards'
+import { resolveCorespaceUrl } from '@root/utilities/resolveCorespaceUrl'
 import { unstable_cache } from 'next/cache'
 import { draftMode } from 'next/headers'
+import { redirect } from 'next/navigation'
 import React from 'react'
 
 const pageCacheKey = (slug: string | string[]) => {
@@ -104,6 +106,12 @@ const Page = async ({
   const { isEnabled: draft } = await draftMode()
   const { slug } = await params
   const url = '/' + (Array.isArray(slug) ? slug.join('/') : slug)
+  const canonicalUrl = resolveCorespaceUrl(url) || url
+
+  // Legacy / duplicate paths → single public canonical
+  if (canonicalUrl !== url) {
+    redirect(canonicalUrl)
+  }
 
   const page = await getPage(slug, draft)
 
@@ -115,7 +123,7 @@ const Page = async ({
 
   return (
     <React.Fragment>
-      <PayloadRedirects disableNotFound url={url} />
+      <PayloadRedirects disableNotFound url={canonicalUrl} />
       <RefreshRouteOnSave />
       <Hero firstContentBlock={layout[0]} page={page} />
       <RenderBlocks blocks={layout} hero={page.hero} />
@@ -129,9 +137,23 @@ export async function generateStaticParams() {
   const getPages = unstable_cache(fetchPages, ['pages'])
   const pages = await getPages()
 
-  return pages.map(({ breadcrumbs }) => ({
-    slug: breadcrumbs?.[breadcrumbs.length - 1]?.url?.replace(/^\/|\/$/g, '').split('/'),
-  }))
+  return pages
+    .map(({ breadcrumbs }) => {
+      const raw = breadcrumbs?.[breadcrumbs.length - 1]?.url || ''
+      // Service / project children use dedicated /service/* and /project/* routes
+      if (raw.startsWith('/services/') || raw.startsWith('/projects/')) {
+        return null
+      }
+      const canonical = resolveCorespaceUrl(raw) || raw
+      // Homepage is served at `/` via (pages)/page.tsx — do not emit /home
+      if (!canonical || canonical === '/') {
+        return null
+      }
+      return {
+        slug: canonical.replace(/^\/|\/$/g, '').split('/'),
+      }
+    })
+    .filter(Boolean)
 }
 
 export async function generateMetadata({
@@ -152,8 +174,13 @@ export async function generateMetadata({
   }
 
   const noIndexMeta = page?.noindex ? { robots: 'noindex' } : {}
+  const rawPath = Array.isArray(slug) && slug.length ? `/${slug.join('/')}` : '/'
+  const canonicalPath = resolveCorespaceUrl(rawPath) || rawPath
 
   return {
+    alternates: {
+      canonical: canonicalPath,
+    },
     description: page?.meta?.description,
     openGraph: mergeOpenGraph({
       description: page?.meta?.description ?? undefined,
@@ -164,10 +191,10 @@ export async function generateMetadata({
             },
           ]
         : undefined,
-      title: page?.meta?.title || 'Payload',
-      url: Array.isArray(slug) ? slug.join('/') : '/',
+      title: page?.meta?.title || page?.title || 'Corespace Builders',
+      url: canonicalPath,
     }),
-    title: page?.meta?.title || 'Payload',
+    title: page?.meta?.title || page?.title || 'Corespace Builders',
     ...noIndexMeta,
   }
 }

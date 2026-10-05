@@ -25,7 +25,7 @@ type CostEstimateCtaProps = {
 export const CostEstimateCta: React.FC<CostEstimateCtaProps> = ({
   appearance = 'primary',
   className,
-  formSource = FORM_SOURCES.PAGE,
+  formSource = FORM_SOURCES.COST_ESTIMATE,
   link,
 }) => {
   const { form, openCostEstimateForm } = useCostEstimateForm()

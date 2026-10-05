@@ -3,7 +3,6 @@
 import type { Form as FormType } from '@root/payload-types'
 
 import { fields as cmsFields } from '@components/CMSForm/fields'
-import { RichText } from '@components/RichText/index'
 import Form from '@forms/Form/index'
 import { useForm, useFormProcessing } from '@forms/Form/context'
 import { getCookie } from '@root/utilities/get-cookie'
@@ -11,7 +10,9 @@ import {
   buildTrackingSubmissionData,
   FORM_SOURCES,
   mergeSubmissionData,
+  resolveFormThankYouPath,
 } from '@root/utilities/formTracking'
+import { useCostEstimateForm } from '@root/providers/CostEstimateForm/index'
 import { resolveWhatsAppUrl } from '@root/utilities/whatsapp'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import React, { useCallback, useMemo, useState } from 'react'
@@ -96,6 +97,20 @@ const buildWizardSteps = (fields: SteppableField[]): WizardStep[] => {
   return steps
 }
 
+const isOptionSelectField = (field: SteppableField): boolean => {
+  return field.blockType === 'select'
+}
+
+/** Every single-question step must have an answer before Next. */
+const isStepFieldRequired = (field: SteppableField, stepKind: WizardStep['kind']): boolean => {
+  if (stepKind === 'single') {
+    return true
+  }
+
+  return Boolean(field.required)
+}
+
+const OPTION_STEP_VALIDATION_MESSAGE = 'Please select an option to continue.'
 const STEP_VALIDATION_MESSAGE = 'Please complete all required fields to continue.'
 
 const getStepFieldKey = (field: SteppableField, index: number) => field.id ?? `${field.name}-${index}`
@@ -113,6 +128,19 @@ const isFieldValueEmpty = (field: SteppableField, value: unknown): boolean => {
   )
 }
 
+/** True only when the stored value is one of this step's selectable options. */
+const hasValidSelectedOption = (field: SteppableField, value: unknown): boolean => {
+  if (isFieldValueEmpty(field, value)) {
+    return false
+  }
+
+  if (field.blockType === 'select' && 'options' in field) {
+    return (field.options || []).some((option) => option.value === value)
+  }
+
+  return true
+}
+
 const buildInitialState = (fields: FormField[]) => {
   const state: Record<
     string,
@@ -125,11 +153,19 @@ const buildInitialState = (fields: FormField[]) => {
     }
 
     const defaultValue = 'defaultValue' in field ? field.defaultValue : undefined
+    // Don't pre-fill select options — user must choose on each step.
+    const initialValue =
+     isOptionSelectField(field) && !hasValidSelectedOption(field, defaultValue)
+        ? undefined
+        : defaultValue
+    const requiresValue = Boolean(field.required) || isOptionSelectField(field)
     state[field.name] = {
-      errorMessage: 'This field is required.',
-      initialValue: defaultValue ?? undefined,
-      valid: !field.required || defaultValue !== undefined,
-      value: defaultValue ?? undefined,
+      errorMessage: isOptionSelectField(field)
+        ? OPTION_STEP_VALIDATION_MESSAGE
+        : 'This field is required.',
+      initialValue: initialValue ?? undefined,
+      valid: !requiresValue || initialValue !== undefined,
+      value: initialValue ?? undefined,
     }
   })
 
@@ -191,7 +227,8 @@ const StepField: React.FC<{
   form: FormType
   isActive: boolean
   isProcessing: boolean
-}> = ({ field, form, isActive, isProcessing }) => {
+  onOptionSelect?: (value: string) => void
+}> = ({ field, form, isActive, isProcessing, onOptionSelect }) => {
   const FieldComponent = cmsFields?.[field.blockType]
   const useSelectCards = field.blockType === 'select'
 
@@ -205,9 +242,10 @@ const StepField: React.FC<{
         <SelectCards
           label={field.label}
           name={field.name}
+          onSelect={onOptionSelect}
           options={field.options}
           path={field.name}
-          required={field.required}
+          required
         />
       ) : (
         <>
@@ -232,10 +270,10 @@ const StepField: React.FC<{
 const StepNavigator: React.FC<{
   form: FormType
   steps: WizardStep[]
-  whatsappUrl?: null | string
-}> = ({ form, steps, whatsappUrl }) => {
+}> = ({ form, steps }) => {
   const [stepIndex, setStepIndex] = useState(0)
   const [stepError, setStepError] = useState<string | null>(null)
+  const [hasOptionOnStep, setHasOptionOnStep] = useState(false)
   const { dispatchFields, getField, handleSubmit } = useForm()
   const isProcessing = useFormProcessing()
 
@@ -244,7 +282,33 @@ const StepNavigator: React.FC<{
   const isLastStep = stepIndex === totalSteps - 1
   const progress = totalSteps > 0 ? ((stepIndex + 1) / totalSteps) * 100 : 0
   const currentLabel = currentStep?.label || 'Continue'
-  const showWhatsApp = isLastStep && Boolean(whatsappUrl)
+  const isOptionStep =
+    currentStep?.kind === 'single' && isOptionSelectField(currentStep.field)
+
+  React.useEffect(() => {
+    setStepError(null)
+
+    if (!currentStep) {
+      setHasOptionOnStep(false)
+      return
+    }
+
+    // Contact details step — Next handled by field required flags.
+    if (currentStep.kind === 'contact') {
+      setHasOptionOnStep(true)
+      return
+    }
+
+    // Option steps 1–6: only enable Next if THIS step already has a real choice
+    // (e.g. user went Back). Never carry over selection from the previous step.
+    if (isOptionSelectField(currentStep.field)) {
+      const existing = getField(currentStep.field.name)?.value
+      setHasOptionOnStep(hasValidSelectedOption(currentStep.field, existing))
+      return
+    }
+
+    setHasOptionOnStep(false)
+  }, [getField, stepIndex]) // eslint-disable-line react-hooks/exhaustive-deps -- reset on step change only
 
   const validateCurrentStep = useCallback(() => {
     if (!currentStep) {
@@ -259,14 +323,23 @@ const StepNavigator: React.FC<{
     for (const field of fieldsToValidate) {
       const fieldState = getField(field.name)
       const value = fieldState?.value
-      const empty = isFieldValueEmpty(field, value)
+      const requiresValue = isStepFieldRequired(field, currentStep.kind)
+      const empty =
+        currentStep.kind === 'single' && isOptionSelectField(field)
+          ? !hasValidSelectedOption(field, value)
+          : isFieldValueEmpty(field, value)
 
-      if (field.required && empty) {
+      if (requiresValue && empty) {
         hasError = true
+        const errorMessage =
+          currentStep.kind === 'single'
+            ? OPTION_STEP_VALIDATION_MESSAGE
+            : STEP_VALIDATION_MESSAGE
+
         dispatchFields({
           type: 'UPDATE',
           payload: {
-            errorMessage: STEP_VALIDATION_MESSAGE,
+            errorMessage,
             path: field.name,
             valid: false,
             value: value ?? (field.blockType === 'checkbox' ? false : ''),
@@ -276,7 +349,11 @@ const StepNavigator: React.FC<{
     }
 
     if (hasError) {
-      setStepError(STEP_VALIDATION_MESSAGE)
+      const message =
+        currentStep.kind === 'single'
+          ? OPTION_STEP_VALIDATION_MESSAGE
+          : STEP_VALIDATION_MESSAGE
+      setStepError(message)
       return false
     }
 
@@ -285,6 +362,11 @@ const StepNavigator: React.FC<{
   }, [currentStep, dispatchFields, getField])
 
   const goNext = useCallback(() => {
+    if (isOptionStep && !hasOptionOnStep) {
+      setStepError(OPTION_STEP_VALIDATION_MESSAGE)
+      return
+    }
+
     if (!validateCurrentStep()) {
       return
     }
@@ -299,11 +381,22 @@ const StepNavigator: React.FC<{
       return
     }
 
+    // Reset before moving so step 3 / 4 Next stays locked until a new choice.
+    setHasOptionOnStep(false)
+    setStepError(null)
     setStepIndex((index) => Math.min(index + 1, totalSteps - 1))
-  }, [handleSubmit, isLastStep, totalSteps, validateCurrentStep])
+  }, [
+    handleSubmit,
+    hasOptionOnStep,
+    isLastStep,
+    isOptionStep,
+    totalSteps,
+    validateCurrentStep,
+  ])
 
   const goBack = useCallback(() => {
     setStepError(null)
+    setHasOptionOnStep(false)
     setStepIndex((index) => Math.max(index - 1, 0))
   }, [])
 
@@ -345,6 +438,12 @@ const StepNavigator: React.FC<{
             isActive={index === stepIndex}
             isProcessing={isProcessing}
             key={getStepFieldKey(step.field, index)}
+            onOptionSelect={(value) => {
+              if (index === stepIndex && value) {
+                setHasOptionOnStep(true)
+                setStepError(null)
+              }
+            }}
           />
         )
       })}
@@ -364,19 +463,9 @@ const StepNavigator: React.FC<{
           <span />
         )}
         <div className={classes.navActions}>
-          {showWhatsApp ? (
-            <a
-              className={classes.whatsappButton}
-              href={whatsappUrl || undefined}
-              rel="noopener noreferrer"
-              target="_blank"
-            >
-              Chat on WhatsApp
-            </a>
-          ) : null}
           <button
             className={classes.nextButton}
-            disabled={isProcessing}
+            disabled={isProcessing || (isOptionStep && !hasOptionOnStep)}
             onClick={goNext}
             type="button"
           >
@@ -407,7 +496,6 @@ export const StepFormWizard: React.FC<StepFormWizardProps> = ({
   onSubmitted,
   steps: stepsFromProps,
   variant = 'page',
-  whatsappUrl,
 }) => {
   const [hasSubmitted, setHasSubmitted] = useState(false)
   const router = useRouter()
@@ -419,7 +507,6 @@ export const StepFormWizard: React.FC<StepFormWizardProps> = ({
     [form.fields],
   )
   const steps = stepsFromProps ?? buildWizardSteps(formFields)
-  const resolvedWhatsAppUrl = resolveWhatsAppUrl(whatsappUrl)
 
   const onSubmit = useCallback(
     async ({ data }: { data: Record<string, unknown> }) => {
@@ -462,53 +549,30 @@ export const StepFormWizard: React.FC<StepFormWizardProps> = ({
       toast.success('Form submitted successfully!')
       onSubmitted?.()
 
-      if (form.confirmationType === 'redirect' && form.redirect?.url) {
-        const url = form.redirect.url
-        const redirectUrl = new URL(url, process.env.NEXT_PUBLIC_SITE_URL)
-        const firstSelect = form.fields?.find(
-          (field) => field.blockType === 'select' && 'name' in field,
-        )
+      // Always land on thank-you (CMS redirect preferred, else /thank-you)
+      const thankYouPath = resolveFormThankYouPath(form.redirect?.url)
+      const redirectUrl = new URL(thankYouPath, process.env.NEXT_PUBLIC_SITE_URL || window.location.origin)
+      const firstSelect = form.fields?.find(
+        (field) => field.blockType === 'select' && 'name' in field,
+      )
 
-        if (firstSelect && 'name' in firstSelect) {
-          const submittedValue = data[firstSelect.name]
+      if (firstSelect && 'name' in firstSelect) {
+        const submittedValue = data[firstSelect.name]
 
-          if (submittedValue) {
-            redirectUrl.searchParams.set('project', String(submittedValue))
-          }
-        }
-
-        if (url.startsWith('/') || redirectUrl.origin === process.env.NEXT_PUBLIC_SITE_URL) {
-          router.push(`${redirectUrl.pathname}${redirectUrl.search}`)
-        } else {
-          window.location.assign(redirectUrl.href)
+        if (submittedValue) {
+          redirectUrl.searchParams.set('project', String(submittedValue))
         }
       }
-    },
-    [
-      form.confirmationType,
-      form.fields,
-      form.id,
-      form.redirect?.url,
-      formSource,
-      onSubmitted,
-      pathname,
-      router,
-      searchParams,
-    ],
-  )
 
-  if (hasSubmitted && form.confirmationType === 'message') {
-    return (
-      <div className={classes.confirmation}>
-        <RichText content={form.confirmationMessage} />
-      </div>
-    )
-  }
+      router.push(`${redirectUrl.pathname}${redirectUrl.search}`)
+    },
+    [form.fields, form.id, form.redirect?.url, formSource, onSubmitted, pathname, router, searchParams],
+  )
 
   if (hasSubmitted) {
     return (
       <div className={classes.confirmation}>
-        <p>Thank you — we received your enquiry.</p>
+        <p>Thank you — redirecting…</p>
       </div>
     )
   }
@@ -516,7 +580,7 @@ export const StepFormWizard: React.FC<StepFormWizardProps> = ({
   return (
     <Form formId={form.id} initialState={initialState} onSubmit={onSubmit}>
       <div className={variant === 'modal' ? classes.modalWizard : undefined}>
-        <StepNavigator form={form} steps={steps} whatsappUrl={resolvedWhatsAppUrl} />
+        <StepNavigator form={form} steps={steps} />
       </div>
     </Form>
   )
@@ -549,20 +613,28 @@ export const CorespaceStepForm: React.FC<CorespaceStepFormProps> = ({
   whatsappUrl,
 }) => {
   const pathname = usePathname()
+  const { form: masterForm } = useCostEstimateForm()
   const resolvedWhatsAppUrl = resolveWhatsAppUrl(whatsappUrl)
-  if (!form || typeof form === 'string') {
+
+  // Prefer the site-wide master lead form (Main Menu) so Contact matches modal CTAs
+  const activeForm =
+    masterForm || (form && typeof form !== 'string' ? form : null)
+
+  if (!activeForm) {
     return (
       <div className={classes.stepForm}>
         <div className={classes.header}>
           {eyebrow && <p className={classes.eyebrow}>{eyebrow}</p>}
           {heading && <h2 className={classes.heading}>{heading}</h2>}
         </div>
-        <p className={classes.empty}>Select a form in the CMS to display this step form.</p>
+        <p className={classes.empty}>
+          Select the master lead form in Main Menu → Cost estimate multi-step form.
+        </p>
       </div>
     )
   }
 
-  const formFields = (form.fields || []).filter(isSteppableField)
+  const formFields = (activeForm.fields || []).filter(isSteppableField)
   const steps = buildWizardSteps(formFields)
   const formSource = pathname === '/contact' ? FORM_SOURCES.CONTACT : FORM_SOURCES.PAGE
 
@@ -610,7 +682,7 @@ export const CorespaceStepForm: React.FC<CorespaceStepFormProps> = ({
 
         <div className={classes.formSide}>
           <StepFormInner
-            form={form}
+            form={activeForm}
             formSource={formSource}
             steps={steps}
             whatsappUrl={resolvedWhatsAppUrl}

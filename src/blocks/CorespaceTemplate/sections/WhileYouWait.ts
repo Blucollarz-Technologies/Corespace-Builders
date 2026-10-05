@@ -43,7 +43,7 @@ export const CorespaceWhileYouWaitSection: Block = {
           resourceLink: {
             type: 'custom',
             label: 'Construction Services',
-            url: '/service/construction',
+            url: '/service/construction-karnataka',
           },
         },
         {
@@ -52,7 +52,7 @@ export const CorespaceWhileYouWaitSection: Block = {
           resourceLink: {
             type: 'custom',
             label: 'Architecture Design',
-            url: '/service/architecture',
+            url: '/service/architecture-design-karnataka',
           },
         },
         {
@@ -61,7 +61,7 @@ export const CorespaceWhileYouWaitSection: Block = {
           resourceLink: {
             type: 'custom',
             label: 'Interior Design',
-            url: '/service/interiors',
+            url: '/service/interior-design-services-karnataka',
           },
         },
         {
@@ -70,7 +70,7 @@ export const CorespaceWhileYouWaitSection: Block = {
           resourceLink: {
             type: 'custom',
             label: 'Home Renovation',
-            url: '/service/renovation',
+            url: '/service/home-renovation-karnataka',
           },
         },
         {
@@ -80,7 +80,7 @@ export const CorespaceWhileYouWaitSection: Block = {
           resourceLink: {
             type: 'custom',
             label: 'Homestay & Villa Development',
-            url: '/projects/homestay-villa',
+            url: '/homestay-and-villa-development',
           },
         },
         {
@@ -89,7 +89,7 @@ export const CorespaceWhileYouWaitSection: Block = {
           resourceLink: {
             type: 'custom',
             label: 'Construction Cost Guide',
-            url: '/resources/cost-guide',
+            url: '/cost-guide',
           },
         },
       ],

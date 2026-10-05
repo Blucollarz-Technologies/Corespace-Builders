@@ -1,0 +1,20 @@
+@use '@scss/common' as *;
+
+.termsWrap {
+  padding-block: var(--header-height);
+
+  & a {
+    text-decoration: none;
+    color: var(--color-purple-600);
+    border-bottom: 1px dotted currentColor;
+    transition: all 0.2s ease;
+
+    &:visited {
+      color: var(--color-purple-600);
+    }
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+}

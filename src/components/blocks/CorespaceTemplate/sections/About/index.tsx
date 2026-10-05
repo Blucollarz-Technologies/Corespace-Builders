@@ -5,6 +5,7 @@ import type { Media as MediaType } from '@root/payload-types'
 import { CostEstimateCta } from '@components/CostEstimateCta/index'
 import { CMSLink, type LinkType, type Reference } from '@components/CMSLink/index'
 import { FORM_SOURCES } from '@root/utilities/formTracking'
+import { DEFAULT_WHATSAPP_LINK, resolveWhatsAppUrl } from '@root/utilities/whatsapp'
 import { Media } from '@components/Media/index'
 import React from 'react'
 
@@ -33,6 +34,27 @@ export type CorespaceAboutProps = {
   secondaryCta?: LinkGroup | null
 }
 
+const isWhatsAppUrl = (url?: null | string): boolean => {
+  const value = url?.toLowerCase() ?? ''
+  return value.includes('wa.me') || value.includes('whatsapp')
+}
+
+const isWhatsAppCta = (link?: LinkGroup | null): boolean => {
+  const label = link?.label?.toLowerCase() ?? ''
+  return label.includes('whatsapp') || isWhatsAppUrl(link?.url)
+}
+
+/** Force a real WhatsApp deep link — CMS often stores /contact by mistake. */
+const toWhatsAppLink = (link: LinkGroup): LinkGroup => ({
+  ...DEFAULT_WHATSAPP_LINK,
+  ...link,
+  label: link.label || DEFAULT_WHATSAPP_LINK.label,
+  newTab: true,
+  reference: undefined,
+  type: 'custom',
+  url: resolveWhatsAppUrl(isWhatsAppUrl(link.url) ? link.url : undefined),
+})
+
 export const CorespaceAbout: React.FC<CorespaceAboutProps> = ({
   closing,
   eyebrow,
@@ -48,6 +70,12 @@ export const CorespaceAbout: React.FC<CorespaceAboutProps> = ({
   const hasPrimary = Boolean(primaryCta?.label)
   const hasSecondary = Boolean(secondaryCta?.label)
   const hasItems = Array.isArray(items) && items.length > 0
+  const secondaryLink =
+    hasSecondary && secondaryCta
+      ? isWhatsAppCta(secondaryCta)
+        ? toWhatsAppLink(secondaryCta)
+        : secondaryCta
+      : null
 
   return (
     <div className={classes.about}>
@@ -95,12 +123,12 @@ export const CorespaceAbout: React.FC<CorespaceAboutProps> = ({
                 link={primaryCta}
               />
             )}
-            {hasSecondary && (
+            {secondaryLink && (
               <CMSLink
-                {...secondaryCta}
+                {...secondaryLink}
                 appearance="secondary"
                 className={classes.secondaryCta}
-                label={secondaryCta?.label}
+                label={secondaryLink.label}
               />
             )}
           </div>

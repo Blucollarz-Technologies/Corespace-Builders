@@ -1,5 +1,8 @@
 export const FORM_NOTIFICATION_EMAIL = 'corespacebuilders@gmail.com'
 
+/** Default success destination for all master lead-form submissions. */
+export const FORM_THANK_YOU_PATH = '/thank-you'
+
 export const FORM_SOURCES = {
   CONSULTATION_PLAN: 'Consultation Plan',
   CONTACT: 'Contact',
@@ -9,6 +12,27 @@ export const FORM_SOURCES = {
 } as const
 
 export type FormSource = (typeof FORM_SOURCES)[keyof typeof FORM_SOURCES]
+
+/**
+ * Prefer CMS redirect when set; otherwise always land on /thank-you.
+ */
+export function resolveFormThankYouPath(redirectUrl?: null | string): string {
+  const trimmed = redirectUrl?.trim()
+  if (!trimmed) {
+    return FORM_THANK_YOU_PATH
+  }
+
+  try {
+    if (trimmed.startsWith('/')) {
+      return trimmed.split('?')[0] || FORM_THANK_YOU_PATH
+    }
+
+    const parsed = new URL(trimmed, process.env.NEXT_PUBLIC_SITE_URL || 'https://www.corespacebuilders.com')
+    return parsed.pathname || FORM_THANK_YOU_PATH
+  } catch {
+    return FORM_THANK_YOU_PATH
+  }
+}
 
 export type TrackingField = {
   field: string

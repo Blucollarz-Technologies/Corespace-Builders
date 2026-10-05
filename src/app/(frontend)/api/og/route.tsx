@@ -12,8 +12,8 @@ export async function GET(req: NextRequest): Promise<ImageResponse> {
 
     const untitledSansRegular = await readFile(join(publicDir, 'fonts/UntitledSans-Regular.woff'))
     const untitledSansMedium = await readFile(join(publicDir, 'fonts/UntitledSans-Medium.woff'))
-    const favicon = await readFile(join(publicDir, 'images/favicon-light.png'))
-    const faviconDataUrl = `data:image/png;base64,${favicon.toString('base64')}`
+    const favicon = await readFile(join(publicDir, 'images/favicon-light.svg'))
+    const faviconDataUrl = `data:image/svg+xml;base64,${favicon.toString('base64')}`
 
     const { searchParams } = new URL(req.url)
 

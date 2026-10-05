@@ -10,15 +10,12 @@ function getLocalDistDir() {
 }
 
 function getNextDistDir() {
-  if (process.env.VERCEL) {
-    return '.next'
-  }
-
   if (process.env.NEXT_DIST_DIR) {
     return process.env.NEXT_DIST_DIR
   }
 
-  return 'node_modules/.cache/next'
+  // Keep build output inside the project so Next can resolve node_modules correctly.
+  return '.next'
 }
 
 /** All dist folders that may exist from older setups (safe to delete). */

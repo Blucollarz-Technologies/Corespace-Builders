@@ -37,31 +37,17 @@ export const CorespaceCostClaritySection: Block = {
         'Planning note: a realistic budget is set before design is finalized — not after construction begins.',
       label: 'Planning note',
     },
-    {
-      type: 'row',
-      fields: [
-        link({
-          appearances: false,
-          overrides: {
-            name: 'primaryCta',
-            label: 'Primary CTA',
-            admin: {
-              width: '50%',
-            },
-          },
-        }),
-        link({
-          appearances: false,
-          overrides: {
-            name: 'secondaryCta',
-            label: 'Secondary link',
-            admin: {
-              width: '50%',
-            },
-          },
-        }),
-      ],
-    },
+    link({
+      appearances: false,
+      overrides: {
+        name: 'primaryCta',
+        label: 'Primary CTA',
+        admin: {
+          description:
+            'e.g. Get Your Estimate — opens the cost estimate multi-step form modal when Main Menu form is set.',
+        },
+      },
+    }),
     {
       name: 'rangeLabel',
       type: 'text',

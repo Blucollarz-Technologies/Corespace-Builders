@@ -1,36 +1,18 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 32 32">
-
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
   <g transform="translate(0, 2)">
-
     <path
-
       d="M16 2L4 24H12L16 16L20 24H28L16 2Z"
-
-      fill="#ffffff"
-
-      stroke="#ffffff"
-
+      fill="#1f3a34"
+      stroke="#1f3a34"
       stroke-linejoin="round"
-
       stroke-width="1.5"
-
     />
-
     <path
-
       d="M10 24C12.5 21.5 19.5 21.5 22 24"
-
       fill="none"
-
       stroke="#b8663b"
-
       stroke-linecap="round"
-
       stroke-width="2"
-
     />
-
   </g>
-
 </svg>
-

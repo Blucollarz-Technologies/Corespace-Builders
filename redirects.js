@@ -14,6 +14,12 @@ export const redirects = async () => {
       permanent: true,
     },
     {
+      // Homepage CMS slug must not remain a duplicate indexable URL
+      source: '/home',
+      destination: '/',
+      permanent: true,
+    },
+    {
       source: '/services/:slug',
       destination: '/service/:slug',
       permanent: true,
@@ -21,6 +27,27 @@ export const redirects = async () => {
     {
       source: '/projects/:slug',
       destination: '/project/:slug',
+      permanent: true,
+    },
+    // Short CMS / footer aliases → published service page slugs
+    {
+      source: '/service/renovation',
+      destination: '/service/home-renovation-karnataka',
+      permanent: true,
+    },
+    {
+      source: '/service/architecture',
+      destination: '/service/architecture-design-karnataka',
+      permanent: true,
+    },
+    {
+      source: '/service/interiors',
+      destination: '/service/interior-design-services-karnataka',
+      permanent: true,
+    },
+    {
+      source: '/service/construction',
+      destination: '/service/construction-karnataka',
       permanent: true,
     },
   ]

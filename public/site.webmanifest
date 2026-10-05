@@ -1,0 +1,23 @@
+{
+  "name": "Corespace Builders",
+  "short_name": "Corespace",
+  "description": "Homes, villas, and homestays in Coorg — planned with clear cost, design, and execution.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1f3a34",
+  "theme_color": "#1f3a34",
+  "icons": [
+    {
+      "src": "/images/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/favicon-light.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}

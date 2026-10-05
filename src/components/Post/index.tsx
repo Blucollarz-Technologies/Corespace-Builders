@@ -1,127 +1,161 @@
 import type { Post as PostType } from '@root/payload-types'
 
-import { BackgroundGrid } from '@components/BackgroundGrid/index'
 import { Breadcrumbs } from '@components/Breadcrumbs/index'
-import { Gutter } from '@components/Gutter/index'
 import { Media } from '@components/Media/index'
 import { RenderBlocks } from '@components/RenderBlocks/index'
 import { RichText } from '@components/RichText/index'
 import { Video } from '@components/RichText/Video/index'
-import { ArrowRightIcon } from '@icons/ArrowRightIcon/index'
 import { getVideo } from '@root/utilities/get-video'
 import { formatDate } from '@utilities/format-date-time'
 import React from 'react'
 
-import { AuthorsList, GuestAuthorList } from './AuthorsList/index'
 import classes from './index.module.scss'
+
+function getAuthorLabel(props: Partial<PostType>): string {
+  if (props.authorType === 'guest' && props.guestAuthor) {
+    return props.guestAuthor
+  }
+
+  const authors = props.authors
+  if (!authors?.length) {
+    return 'Corespace Builders Team'
+  }
+
+  const names = authors
+    .map((author) => {
+      if (!author || typeof author === 'string') {
+        return null
+      }
+
+      const name = [author.firstName, author.lastName].filter(Boolean).join(' ')
+      return name || null
+    })
+    .filter(Boolean)
+
+  return names.length > 0 ? names.join(', ') : 'Corespace Builders Team'
+}
+
+function estimateReadTime(props: Partial<PostType>): number {
+  const text = JSON.stringify({
+    content: props.content,
+    excerpt: props.excerpt,
+    title: props.title,
+  })
+
+  const words = text.split(/\s+/).filter(Boolean).length
+  return Math.max(1, Math.round(words / 200))
+}
+
 export const Post: React.FC<Partial<PostType>> = (props) => {
   const {
-    authorType,
     category,
     content,
     excerpt,
     featuredMedia,
-    guestAuthor,
-    guestSocials,
     image,
     publishedOn,
     relatedPosts,
     title,
+    updatedAt,
     videoUrl,
   } = props
 
-  return (
-    <div className={classes.post} id="blog">
-      <BackgroundGrid wideGrid />
-      <Gutter>
-        <div className={[classes.grid, 'grid'].filter(Boolean).join(' ')}>
-          <div className={[classes.stickyColumn, 'cols-3 start-1'].filter(Boolean).join(' ')}>
-            <div className={classes.stickyContent}>
-              {authorType === 'team' ? (
-                <AuthorsList authors={props.authors} />
-              ) : (
-                <GuestAuthorList author={guestAuthor} socials={guestSocials} />
-              )}
-            </div>
-          </div>
+  const categoryName = typeof category !== 'string' ? category?.name : 'Blog'
+  const categorySlug = typeof category !== 'string' ? category?.slug : 'blog'
+  const authorLabel = getAuthorLabel(props)
+  const readMinutes = estimateReadTime(props)
 
-          <div
-            className={[classes.blogWrap, 'blog-wrap', 'cols-8 start-5 cols-m-8 start-m-1']
-              .filter(Boolean)
-              .join(' ')}
-          >
-            <div className={classes.titleWrap}>
-              <div>
-                <Breadcrumbs
-                  className={classes.breadcrumbs}
-                  items={[
-                    {
-                      label: (
-                        <span className={classes.allPosts}>
-                          <ArrowRightIcon />
-                          {typeof category !== 'string' && category?.name}
-                        </span>
-                      ),
-                      url: typeof category !== 'string' ? `/posts/${category?.slug}` : 'posts/blog',
-                    },
-                    {
-                      ...(publishedOn && {
-                        label: <time>{formatDate({ date: publishedOn })}</time>,
-                      }),
-                    },
-                  ]}
-                />
-                <h1 className={classes.title}>{title}</h1>
-                {typeof category !== 'string' &&
-                  category?.slug === 'guides' &&
-                  (authorType === 'guest' ? (
-                    <span className={classes.guideBadge}>Community Guide</span>
-                  ) : (
-                    <span className={classes.guideBadge}>Official Guide</span>
-                  ))}
+  const publishedLabel = publishedOn
+    ? formatDate({ date: publishedOn, format: 'shortDateStamp' })
+    : null
+
+  const updatedLabel = updatedAt
+    ? formatDate({ date: updatedAt, format: 'shortDateStamp' })
+    : publishedLabel
+
+  const heroMedia =
+    featuredMedia === 'upload'
+      ? image && typeof image !== 'string' && (
+          <Media className={classes.heroImage} priority resource={image} />
+        )
+      : videoUrl && <Video {...getVideo(videoUrl)} />
+
+  return (
+    <article className={classes.post} id="blog">
+      <div className={classes.container}>
+        <header className={classes.header}>
+          <Breadcrumbs
+            className={classes.breadcrumbs}
+            ellipsis={false}
+            items={[
+              { label: 'Home', url: '/' },
+              { label: categoryName, url: `/posts/${categorySlug}` },
+              { label: title },
+            ]}
+          />
+
+          {categoryName && <span className={classes.categoryBadge}>{categoryName}</span>}
+
+          {title && <h1 className={classes.title}>{title}</h1>}
+
+          {excerpt && <RichText className={classes.excerpt} content={excerpt} />}
+
+          <div className={classes.meta}>
+            <div className={classes.metaItem}>
+              <span aria-hidden className={classes.metaIcon}>✏️</span>
+              <div className={classes.metaText}>
+                <span className={classes.metaValue}>{authorLabel}</span>
+                <span className={classes.metaLabel}>Author</span>
               </div>
-              <div className={classes.mobileAuthor}>
-                {authorType === 'team' ? (
-                  <AuthorsList authors={props.authors} />
-                ) : (
-                  <GuestAuthorList author={guestAuthor} socials={guestSocials} />
-                )}
+            </div>
+
+            {publishedLabel && (
+              <div className={classes.metaItem}>
+                <span aria-hidden className={classes.metaIcon}>📅</span>
+                <div className={classes.metaText}>
+                  <span className={classes.metaValue}>Published {publishedLabel}</span>
+                  <span className={classes.metaLabel}>Published</span>
+                </div>
               </div>
-            </div>
-            <div className={classes.heroImageWrap}>
-              {featuredMedia === 'upload'
-                ? image &&
-                  typeof image !== 'string' && (
-                    <Media className={classes.heroImage} priority resource={image} />
-                  )
-                : videoUrl && <Video {...getVideo(videoUrl)} />}
-            </div>
-            <div className={classes.mobileImage}>
-              {featuredMedia === 'upload'
-                ? image &&
-                  typeof image !== 'string' && (
-                    <Media className={classes.heroImage} priority resource={image} />
-                  )
-                : videoUrl && <Video {...getVideo(videoUrl)} />}
-            </div>
-            <RichText className={classes.excerpt} content={excerpt} />
-            <div className={classes.blocks}>
-              <RenderBlocks
-                blocks={[
-                  ...(content || []),
-                  {
-                    blockName: 'Related Posts',
-                    blockType: 'relatedPosts',
-                    relatedPosts: relatedPosts || [],
-                  },
-                ]}
-                disableGrid
-                disableGutter
-              />
+            )}
+
+            {updatedLabel && (
+              <div className={classes.metaItem}>
+                <span aria-hidden className={classes.metaIcon}>🔄</span>
+                <div className={classes.metaText}>
+                  <span className={classes.metaValue}>Updated {updatedLabel}</span>
+                  <span className={classes.metaLabel}>Updated</span>
+                </div>
+              </div>
+            )}
+
+            <div className={classes.metaItem}>
+              <span aria-hidden className={classes.metaIcon}>⏱️</span>
+              <div className={classes.metaText}>
+                <span className={classes.metaValue}>{readMinutes} min read</span>
+                <span className={classes.metaLabel}>Read time</span>
+              </div>
             </div>
           </div>
+        </header>
+
+        {heroMedia && <div className={classes.heroImageWrap}>{heroMedia}</div>}
+
+        <div className={classes.blocks}>
+          <RenderBlocks
+            blocks={[
+              ...(content || []),
+              {
+                blockName: 'Related Posts',
+                blockType: 'relatedPosts',
+                relatedPosts: relatedPosts || [],
+              },
+            ]}
+            disableGrid
+            disableGutter
+          />
         </div>
-      </Gutter>
-    </div>
+      </div>
+    </article>
   )
 }

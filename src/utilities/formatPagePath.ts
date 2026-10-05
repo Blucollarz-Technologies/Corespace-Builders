@@ -1,9 +1,15 @@
+import { resolveCorespaceUrl } from './resolveCorespaceUrl'
+
 export const formatPagePath = (
   collection: string,
   doc: any, // eslint-disable-line @typescript-eslint/no-explicit-any
   category?: string,
 ): string => {
   const { slug, breadcrumbs, parent } = doc
+
+  if (collection === 'pages' && slug === 'home') {
+    return '/'
+  }
 
   const nestedSlug = breadcrumbs?.slice(-1)?.[0]?.url
 
@@ -53,5 +59,5 @@ export const formatPagePath = (
     }
   }
 
-  return `${prefix}${slugPath}`
+  return resolveCorespaceUrl(`${prefix}${slugPath}`) || `${prefix}${slugPath}`
 }

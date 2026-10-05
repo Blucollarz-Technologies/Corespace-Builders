@@ -10,6 +10,7 @@ import {
   buildTrackingSubmissionData,
   FORM_SOURCES,
   mergeSubmissionData,
+  resolveFormThankYouPath,
   type FormSource,
 } from '@root/utilities/formTracking'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
@@ -113,26 +114,12 @@ const RenderForm = ({
           setHasSubmitted(true)
           toast.success('Form submitted successfully!')
 
-          if (confirmationType === 'redirect' && formRedirect) {
-            const { url } = formRedirect
-
-            if (!url) {
-              return
-            }
-
-            const redirectUrl = new URL(url, process.env.NEXT_PUBLIC_SITE_URL)
-
-            try {
-              if (url.startsWith('/') || redirectUrl.origin === process.env.NEXT_PUBLIC_SITE_URL) {
-                router.push(redirectUrl.href)
-              } else {
-                window.location.assign(url)
-              }
-            } catch (err) {
-              console.warn(err) // eslint-disable-line no-console
-              toast.error('Something went wrong. Did not redirect.')
-            }
-          }
+          const thankYouPath = resolveFormThankYouPath(formRedirect?.url)
+          const redirectUrl = new URL(
+            thankYouPath,
+            process.env.NEXT_PUBLIC_SITE_URL || window.location.origin,
+          )
+          router.push(`${redirectUrl.pathname}${redirectUrl.search}`)
         } catch (err) {
           console.warn(err) // eslint-disable-line no-console
           setIsLoading(false)
@@ -142,7 +129,7 @@ const RenderForm = ({
 
       void submitForm()
     },
-    [router, formID, formRedirect, confirmationType, formSource, pathname, searchParams],
+    [router, formID, formRedirect, formSource, pathname, searchParams],
   )
 
   if (!form?.id) {

@@ -21,8 +21,10 @@ import {
   layoutNeedsServiceCards,
   mapPageToServiceCard,
 } from '@root/utilities/serviceCards'
+import { resolveCorespaceUrl } from '@root/utilities/resolveCorespaceUrl'
 import { unstable_cache } from 'next/cache'
 import { draftMode } from 'next/headers'
+import { redirect } from 'next/navigation'
 import React from 'react'
 
 const getServicePage = async (slug: string, draft?: boolean) => {
@@ -99,6 +101,10 @@ const ServicePage = async ({
   const page = await getServicePage(slug, draft)
 
   if (!page) {
+    const aliased = resolveCorespaceUrl(url)
+    if (aliased && aliased !== url) {
+      redirect(aliased)
+    }
     return <PayloadRedirects url={url} />
   }
 
@@ -145,8 +151,12 @@ export async function generateMetadata({
   }
 
   const noIndexMeta = page?.noindex ? { robots: 'noindex' } : {}
+  const canonicalPath = `/service/${slug}`
 
   return {
+    alternates: {
+      canonical: canonicalPath,
+    },
     description: page?.meta?.description,
     openGraph: mergeOpenGraph({
       description: page?.meta?.description ?? undefined,
@@ -158,7 +168,7 @@ export async function generateMetadata({
           ]
         : undefined,
       title: page?.meta?.title || page?.title || 'Service',
-      url: `/service/${slug}`,
+      url: canonicalPath,
     }),
     title: page?.meta?.title || page?.title || 'Service',
     ...noIndexMeta,

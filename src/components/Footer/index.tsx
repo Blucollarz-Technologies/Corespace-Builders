@@ -4,6 +4,7 @@ import type { Footer as FooterType } from '@types'
 
 import { CMSLink } from '@components/CMSLink/index'
 import { Gutter } from '@components/Gutter/index'
+import { withResolvedCorespaceUrl } from '@root/utilities/resolveCorespaceUrl'
 import React from 'react'
 
 import classes from './index.module.scss'
@@ -12,17 +13,29 @@ const FALLBACK_COLUMNS: NonNullable<FooterType['columns']> = [
   {
     label: 'SERVICES',
     navItems: [
-      { link: { type: 'custom', label: 'Construction', url: '/service/construction' } },
-      { link: { type: 'custom', label: 'Architecture', url: '/service/architecture' } },
-      { link: { type: 'custom', label: 'Interiors', url: '/service/interiors' } },
-      { link: { type: 'custom', label: 'Renovation', url: '/service/renovation' } },
+      { link: { type: 'custom', label: 'Construction', url: '/service/construction-karnataka' } },
+      { link: { type: 'custom', label: 'Architecture', url: '/service/architecture-design-karnataka' } },
+      {
+        link: {
+          type: 'custom',
+          label: 'Interiors',
+          url: '/service/interior-design-services-karnataka',
+        },
+      },
+      { link: { type: 'custom', label: 'Renovation', url: '/service/home-renovation-karnataka' } },
     ],
   },
   {
     label: 'PROJECTS',
     navItems: [
       { link: { type: 'custom', label: 'Portfolio', url: '/projects' } },
-      { link: { type: 'custom', label: 'Homestay & Villa', url: '/projects/homestay-villa' } },
+      {
+        link: {
+          type: 'custom',
+          label: 'Homestay & Villa',
+          url: '/homestay-and-villa-development',
+        },
+      },
       {
         link: {
           type: 'custom',
@@ -35,7 +48,7 @@ const FALLBACK_COLUMNS: NonNullable<FooterType['columns']> = [
   {
     label: 'RESOURCES',
     navItems: [
-      { link: { type: 'custom', label: 'Cost Guide', url: '/resources/cost-guide' } },
+      { link: { type: 'custom', label: 'Cost Guide', url: '/cost-guide' } },
       { link: { type: 'custom', label: 'Blog', url: '/blog' } },
     ],
   },
@@ -76,11 +89,19 @@ export const Footer: React.FC<FooterType> = (props) => {
               <div className={classes.column} key={column.id ?? `${column.label}-${columnIndex}`}>
                 {column.label && <p className={classes.colHeader}>{column.label}</p>}
                 <ul className={classes.colItems}>
-                  {column.navItems?.map(({ id, link }, linkIndex) => (
-                    <li key={id ?? `${column.label}-${linkIndex}-${link?.url ?? link?.label ?? 'link'}`}>
-                      <CMSLink className={classes.link} {...link} />
-                    </li>
-                  ))}
+                  {column.navItems?.map(({ id, link }, linkIndex) => {
+                    const resolvedLink = withResolvedCorespaceUrl(link)
+                    return (
+                      <li
+                        key={
+                          id ??
+                          `${column.label}-${linkIndex}-${resolvedLink?.url ?? resolvedLink?.label ?? 'link'}`
+                        }
+                      >
+                        <CMSLink className={classes.link} {...resolvedLink} />
+                      </li>
+                    )
+                  })}
                 </ul>
               </div>
             ))}

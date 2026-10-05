@@ -1,7 +1,7 @@
 'use client'
 
 import { CostEstimateCta } from '@components/CostEstimateCta/index'
-import { CMSLink } from '@components/CMSLink/index'
+import { FORM_SOURCES } from '@root/utilities/formTracking'
 import React from 'react'
 
 import classes from './index.module.scss'
@@ -26,7 +26,6 @@ export type CorespaceCostClarityProps = {
   priceUnit?: null | string
   primaryCta?: LinkGroup | null
   rangeLabel?: null | string
-  secondaryCta?: LinkGroup | null
 }
 
 const ClockIcon = () => (
@@ -60,10 +59,8 @@ export const CorespaceCostClarity: React.FC<CorespaceCostClarityProps> = ({
   priceUnit,
   primaryCta,
   rangeLabel,
-  secondaryCta,
 }) => {
   const hasPrimary = Boolean(primaryCta?.label)
-  const hasSecondary = Boolean(secondaryCta?.label)
   const hasFactors = Array.isArray(factors) && factors.length > 0
 
   return (
@@ -89,22 +86,14 @@ export const CorespaceCostClarity: React.FC<CorespaceCostClarityProps> = ({
             </div>
           )}
 
-          {(hasPrimary || hasSecondary) && (
+          {hasPrimary && (
             <div className={classes.actions}>
-              {hasPrimary && (
-                <CostEstimateCta
-                  appearance="primary"
-                  className={classes.primaryCta}
-                  link={primaryCta}
-                />
-              )}
-              {hasSecondary && (
-                <CMSLink
-                  {...secondaryCta}
-                  className={classes.secondaryCta}
-                  label={`${secondaryCta?.label}${secondaryCta?.label?.includes('→') ? '' : ' →'}`}
-                />
-              )}
+              <CostEstimateCta
+                appearance="primary"
+                className={classes.primaryCta}
+                formSource={FORM_SOURCES.COST_ESTIMATE}
+                link={primaryCta}
+              />
             </div>
           )}
         </div>
