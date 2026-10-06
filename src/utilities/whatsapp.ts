@@ -16,10 +16,20 @@ export const DEFAULT_WHATSAPP_LINK = {
 }
 
 export const isPlaceholderWhatsAppUrl = (url?: null | string) =>
-  !url || url === 'https://wa.me/' || url.includes('XXXXXXXXXX') || url.includes('919876543210')
+  !url ||
+  url === 'https://wa.me/' ||
+  url.includes('XXXXXXXXXX') ||
+  url.includes('919876543210') ||
+  // CMS sometimes stores /contact instead of a real WhatsApp URL
+  (!/wa\.me|whatsapp\.com|api\.whatsapp\.com/i.test(url) && !/^https?:\/\//i.test(url))
 
 export const resolveWhatsAppUrl = (url?: null | string): string => {
   if (!url || isPlaceholderWhatsAppUrl(url)) {
+    return WHATSAPP_LINK
+  }
+
+  // Absolute non-WhatsApp URLs (e.g. /contact mistaken as custom URL with host)
+  if (/^https?:\/\//i.test(url) && !/wa\.me|whatsapp\.com|api\.whatsapp\.com/i.test(url)) {
     return WHATSAPP_LINK
   }
 

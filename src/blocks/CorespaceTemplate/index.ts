@@ -26,6 +26,7 @@ import { CorespacePlaceholderSection } from './sections/Placeholder'
 import { CorespacePositioningSection } from './sections/Positioning'
 import { CorespaceProjectGallerySection } from './sections/ProjectGallery'
 import { CorespaceProofOfWorkSection } from './sections/ProofOfWork'
+import { CorespaceProjectTypeSection } from './sections/ProjectType'
 import { CorespaceQuickAnswerSection } from './sections/QuickAnswer'
 import { CorespaceRelatedPlanningPagesSection } from './sections/RelatedPlanningPages'
 import { CorespaceRenovationCostSection } from './sections/RenovationCost'
@@ -72,6 +73,7 @@ export const CorespaceTemplate: Block = {
             CorespaceCorePrinciplesSection,
             CorespaceDefinitionSection,
             CorespaceDirectAnswerSection,
+            CorespaceProjectTypeSection,
             CorespaceQuickAnswerSection,
             CorespaceRenovationCostSection,
             CorespaceServicesSection,

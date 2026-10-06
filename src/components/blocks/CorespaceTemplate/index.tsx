@@ -32,6 +32,7 @@ import { CorespacePositioning } from './sections/Positioning/index'
 import { CorespaceProjectGallery } from './sections/ProjectGallery/index'
 import { CorespaceProjects } from './sections/Projects/index'
 import { CorespaceProofOfWork } from './sections/ProofOfWork/index'
+import { CorespaceProjectType } from './sections/ProjectType/index'
 import { CorespaceQuickAnswer } from './sections/QuickAnswer/index'
 import { CorespaceRenovationCost } from './sections/RenovationCost/index'
 import { CorespaceRelatedPlanningPages } from './sections/RelatedPlanningPages/index'
@@ -95,6 +96,7 @@ const sectionComponents: Record<string, React.ComponentType<any>> = {
   corespaceProjectGallery: CorespaceProjectGallery,
   corespaceProjects: CorespaceProjects,
   corespaceProofOfWork: CorespaceProofOfWork,
+  corespaceProjectType: CorespaceProjectType,
   corespaceQuickAnswer: CorespaceQuickAnswer,
   corespaceRenovationCost: CorespaceRenovationCost,
   corespaceRelatedPlanningPages: CorespaceRelatedPlanningPages,
