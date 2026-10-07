@@ -265,6 +265,7 @@ export const Button = ({
     href: hrefFromProps,
     htmlButtonType = 'button',
     isCMSFormSubmitButton,
+    label,
     labelClassName,
     mobileFullWidth,
     newTab,
