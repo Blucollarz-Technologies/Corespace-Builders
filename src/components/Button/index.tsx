@@ -9,7 +9,7 @@ import { ArrowIcon } from '@root/icons/ArrowIcon/index'
 import { LoaderIcon } from '@root/icons/LoaderIcon/index'
 import { PlusIcon } from '@root/icons/PlusIcon/index'
 import { SearchIcon } from '@root/icons/SearchIcon/index'
-import { resolveCorespaceUrl } from '@root/utilities/resolveCorespaceUrl'
+import { finalizePublicHref } from '@root/utilities/publicHref'
 import Link from 'next/link'
 import React, { forwardRef, useEffect, useState } from 'react'
 // eslint-disable-next-line import/no-cycle
@@ -83,8 +83,8 @@ type GenerateSlugType = {
   type?: LinkType
   url?: null | string
 }
-const generateHref = (args: GenerateSlugType): string => {
-  const { type, reference, url } = args
+const generateHref = (args: GenerateSlugType & { label?: null | string }): string => {
+  const { type, reference, url, label } = args
 
   let href = ''
 
@@ -111,7 +111,7 @@ const generateHref = (args: GenerateSlugType): string => {
     }
   }
 
-  return resolveCorespaceUrl(href) || ''
+  return finalizePublicHref(href, label)
 }
 
 const ButtonContent: React.FC<ButtonProps> = (props) => {
@@ -274,7 +274,8 @@ export const Button = ({
     url,
   } = props
 
-  const href = hrefFromProps || generateHref({ type, reference, url })
+  const href = hrefFromProps || generateHref({ type, reference, url, label })
+  const openInNewTab = Boolean(newTab) || /wa\.me|whatsapp\.com/i.test(href)
   const [isHovered, setIsHovered] = useState(false)
 
   const [isAnimating, setIsAnimating] = useState(false)
@@ -313,7 +314,7 @@ export const Button = ({
     }
   }, [isHovered, animationDuration])
 
-  const newTabProps = newTab ? { rel: 'noopener noreferrer', target: '_blank' } : {}
+  const newTabProps = openInNewTab ? { rel: 'noopener noreferrer', target: '_blank' } : {}
 
   const className = [
     classNameFromProps,

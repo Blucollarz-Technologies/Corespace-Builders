@@ -23,15 +23,29 @@ export const isPlaceholderWhatsAppUrl = (url?: null | string) =>
   // CMS sometimes stores /contact instead of a real WhatsApp URL
   (!/wa\.me|whatsapp\.com|api\.whatsapp\.com/i.test(url) && !/^https?:\/\//i.test(url))
 
+/** Path left when `https://wa.me` was incorrectly stripped to pathname only. */
+const STRIPPED_WA_PATH = /^\/\d{10,15}(\?|$)/
+
 export const resolveWhatsAppUrl = (url?: null | string): string => {
-  if (!url || isPlaceholderWhatsAppUrl(url)) {
+  if (!url) {
+    return WHATSAPP_LINK
+  }
+
+  const trimmed = url.trim()
+
+  // Repair broken relative WhatsApp paths: /9190…?text=…
+  if (STRIPPED_WA_PATH.test(trimmed)) {
+    return `https://wa.me${trimmed}`
+  }
+
+  if (isPlaceholderWhatsAppUrl(trimmed)) {
     return WHATSAPP_LINK
   }
 
   // Absolute non-WhatsApp URLs (e.g. /contact mistaken as custom URL with host)
-  if (/^https?:\/\//i.test(url) && !/wa\.me|whatsapp\.com|api\.whatsapp\.com/i.test(url)) {
+  if (/^https?:\/\//i.test(trimmed) && !/wa\.me|whatsapp\.com|api\.whatsapp\.com/i.test(trimmed)) {
     return WHATSAPP_LINK
   }
 
-  return url
+  return trimmed
 }

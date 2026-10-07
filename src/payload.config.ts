@@ -90,7 +90,7 @@ import { PartnerProgram } from './globals/PartnerProgram'
 import { TopBar } from './globals/TopBar'
 import { opsCounterPlugin } from './plugins/opsCounter'
 import redeployWebsite from './scripts/redeployWebsite'
-import { FORM_NOTIFICATION_EMAIL } from './utilities/formTracking'
+import { FORM_FROM_EMAIL, FORM_NOTIFICATION_EMAIL } from './utilities/formTracking'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
@@ -395,7 +395,9 @@ export default buildConfig({
     ],
   }),
   email: nodemailerAdapter({
-    defaultFromAddress: FORM_NOTIFICATION_EMAIL,
+    // From must be a SendGrid-verified identity (domain or single sender).
+    // Lead notifications still go TO corespacebuilders@gmail.com below.
+    defaultFromAddress: FORM_FROM_EMAIL,
     defaultFromName: 'Corespace Builders',
     ...sendgridConfig,
   }),
@@ -453,6 +455,7 @@ export default buildConfig({
               }
 
               const defaultEmail = {
+                emailFrom: FORM_FROM_EMAIL,
                 emailTo: FORM_NOTIFICATION_EMAIL,
                 subject: 'New lead from Corespace Builders',
                 message: {
@@ -489,7 +492,9 @@ export default buildConfig({
 
               data.emails = data.emails.map((email) => ({
                 ...email,
+                emailFrom: email?.emailFrom || FORM_FROM_EMAIL,
                 emailTo: FORM_NOTIFICATION_EMAIL,
+                subject: email?.subject || 'New lead from Corespace Builders',
               }))
 
               return data

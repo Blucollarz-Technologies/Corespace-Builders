@@ -10,6 +10,15 @@ const EXCLUDE = [
   '/auth',
   '/auth/*',
 
+  // Assets / icons (not indexable pages)
+  '/icon*',
+  '/*.svg',
+  '/*.ico',
+  '/*.png',
+  '/*.jpg',
+  '/*.jpeg',
+  '/*.webp',
+
   // Internal / Payload leftovers
   '/styleguide',
   '/styleguide/*',
@@ -20,6 +29,13 @@ const EXCLUDE = [
   '/partners',
   '/partners/*',
   '/ie-incompatible.html',
+
+  // Cookie policy — keep page live, but do not push for indexing
+  '/cookie',
+
+  // Legacy Payload case-study templates (not Corespace marketing pages)
+  '/case-studies',
+  '/case-studies/*',
 
   // Thank-you / success (no SEO value)
   '/thank-you',
@@ -44,11 +60,12 @@ module.exports = {
   changefreq: 'weekly',
   priority: 0.7,
   transform: async (config, path) => {
-    // Extra guard for redirect-only / leftover routes
+    // Extra guard for redirect-only / leftover / non-page routes
     if (
       path === '/home' ||
       path === '/privacy-policy' ||
       path === '/posts/blog' ||
+      path === '/cookie' ||
       path === '/api/star-count' ||
       path === '/gh' ||
       path === '/cloud-terms' ||
@@ -60,7 +77,10 @@ module.exports = {
       path.startsWith('/styleguide') ||
       path.startsWith('/cloud') ||
       path.startsWith('/services/') ||
-      path.startsWith('/projects/')
+      path.startsWith('/projects/') ||
+      path.startsWith('/case-studies') ||
+      path.startsWith('/icon') ||
+      /\.(svg|ico|png|jpe?g|webp|gif|txt|xml|json|map)$/i.test(path)
     ) {
       return null
     }
@@ -84,6 +104,9 @@ module.exports = {
           '/styleguide/',
           '/cloud',
           '/cloud/',
+          '/case-studies',
+          '/case-studies/',
+          '/cookie',
           '/thank-you',
           '/thanks-for-subscribing',
         ],
