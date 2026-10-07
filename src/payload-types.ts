@@ -2497,6 +2497,7 @@ export interface CorespaceTemplateBlock {
           | CorespaceCorePrinciplesSection
           | CorespaceDefinitionSection
           | CorespaceDirectAnswerSection
+          | CorespaceProjectTypeSection
           | CorespaceQuickAnswerSection
           | CorespaceRenovationCostSection
           | CorespaceServicesSection
@@ -2650,6 +2651,37 @@ export interface CorespaceDirectAnswerSection {
   id?: string | null;
   blockName?: string | null;
   blockType: 'corespaceDirectAnswer';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CorespaceProjectTypeSection".
+ */
+export interface CorespaceProjectTypeSection {
+  eyebrow?: string | null;
+  heading: string;
+  projectColumnLabel?: string | null;
+  costColumnLabel?: string | null;
+  /**
+   * Each row is a project type and its estimated cost range.
+   */
+  rows?:
+    | {
+        projectType: string;
+        /**
+         * e.g. ₹2,000 – ₹2,800 / sq ft or Project Specific
+         */
+        costRange: string;
+        costEmphasis?: ('default' | 'italic') | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Shown under the table with a bold “Note:” prefix. Leave empty to hide.
+   */
+  note?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'corespaceProjectType';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

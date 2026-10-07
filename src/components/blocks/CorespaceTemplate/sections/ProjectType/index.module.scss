@@ -1,0 +1,159 @@
+@use '@scss/common' as *;
+
+.projectType {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.25rem, 2.5vw, 1.75rem);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  max-width: 46rem;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--brand-terracotta, #b8663b);
+}
+
+.eyebrowDash {
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.heading {
+  margin: 0;
+  font-family: var(--font-heading), Georgia, serif;
+  font-size: clamp(1.85rem, 3.2vw, 2.75rem);
+  font-weight: 600;
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  color: var(--brand-charcoal, #1e2522);
+}
+
+.tableCard {
+  overflow: hidden;
+  border-radius: 16px;
+  border: 1px solid rgba(221, 210, 192, 0.9);
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(31, 58, 52, 0.06);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.thead {
+  background: var(--brand-forest, #1f3a34);
+  color: var(--brand-ivory, #f8f4ec);
+}
+
+.th {
+  padding: 0.95rem 1.25rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: left;
+  border: 0;
+}
+
+.thCost {
+  text-align: right;
+}
+
+.tr {
+  border-top: 1px solid rgba(221, 210, 192, 0.85);
+
+  &:first-child {
+    border-top: 0;
+  }
+}
+
+.td {
+  padding: 1.05rem 1.25rem;
+  font-size: clamp(0.98rem, 1.15vw, 1.08rem);
+  line-height: 1.45;
+  color: var(--brand-charcoal, #1e2522);
+  vertical-align: middle;
+  border: 0;
+}
+
+.tdType {
+  font-weight: 500;
+}
+
+.tdCost {
+  text-align: right;
+  font-weight: 600;
+  color: var(--brand-forest, #1f3a34);
+}
+
+.tdCostItalic {
+  font-style: italic;
+  font-weight: 500;
+  color: var(--brand-slate, #5f665f);
+}
+
+.note {
+  margin: 0;
+  padding: 1rem 1.15rem;
+  border-radius: 12px;
+  background: var(--brand-mist, #efe7da);
+  border: 1px solid rgba(221, 210, 192, 0.85);
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--brand-slate, #5f665f);
+}
+
+.noteLabel {
+  font-weight: 700;
+  color: var(--brand-charcoal, #1e2522);
+}
+
+@include mid-break {
+  .th,
+  .td {
+    padding: 0.9rem 1rem;
+  }
+
+  .table {
+    table-layout: auto;
+  }
+}
+
+@include small-break {
+  .th,
+  .td {
+    display: block;
+    width: 100%;
+    text-align: left;
+  }
+
+  .thCost {
+    display: none;
+  }
+
+  .tr {
+    display: block;
+    padding: 0.85rem 0;
+  }
+
+  .tdCost,
+  .tdCostItalic {
+    text-align: left;
+    padding-top: 0.25rem;
+  }
+}

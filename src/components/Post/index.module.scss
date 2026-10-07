@@ -2,21 +2,48 @@
 
 .post {
   position: relative;
+  isolation: isolate;
   width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
   background: var(--brand-ivory, #f8f4ec);
-  padding: clamp(2rem, 4vw, 3.5rem) clamp(1.25rem, 4vw, 2rem) clamp(3rem, 6vw, 5rem);
+  color: var(--brand-charcoal, #1e2522);
+  margin-top: var(--page-padding-top);
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    z-index: -1;
+    width: 100vw;
+    transform: translateX(-50%);
+    top: 0;
+    bottom: 0;
+    background: var(--brand-ivory, #f8f4ec);
+    pointer-events: none;
+  }
 }
 
-.container {
+.gutter {
   width: 100%;
-  max-width: 52rem;
+  min-width: 0;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(4rem, 8vw, 7.5rem);
+  max-width: 1240px;
   margin: 0 auto;
+  width: 100%;
+  min-width: 0;
 }
 
 .header {
   display: flex;
   flex-direction: column;
   gap: clamp(1rem, 2vw, 1.5rem);
+  max-width: 52rem;
 }
 
 .breadcrumbs {
@@ -55,9 +82,9 @@
   width: 100%;
   max-width: none;
   font-family: var(--font-heading), Georgia, serif;
-  font-size: clamp(2rem, 4.5vw, 2.85rem);
+  font-size: clamp(1.85rem, 3.2vw, 2.75rem);
   font-weight: 600;
-  line-height: 1.15;
+  line-height: 1.18;
   letter-spacing: -0.02em;
   color: var(--brand-charcoal, #1e2522);
 }
@@ -65,7 +92,7 @@
 .excerpt {
   margin: 0;
   max-width: 44rem;
-  font-size: clamp(1rem, 1.2vw, 1.1rem);
+  font-size: clamp(0.98rem, 1.15vw, 1.08rem);
   line-height: 1.65;
   color: var(--brand-slate, #5f665f);
 
@@ -132,7 +159,6 @@
 
 .heroImageWrap {
   width: 100%;
-  margin: clamp(1.5rem, 3vw, 2.5rem) 0 0;
   border-radius: 1rem;
   overflow: hidden;
   box-shadow: var(--brand-shadow, 0 10px 30px rgba(31, 58, 52, 0.08));
@@ -153,13 +179,37 @@
 
 .blocks {
   width: 100%;
-  margin-top: clamp(2rem, 4vw, 3rem);
+  min-width: 0;
 
   > * > * {
-    margin-top: 2rem;
+    margin-top: clamp(4rem, 8vw, 7.5rem);
+
+    &:first-child {
+      margin-top: 0;
+    }
 
     &:last-child {
       margin-bottom: 0;
     }
+  }
+}
+
+@include mid-break {
+  .stack {
+    gap: 3rem;
+  }
+
+  .blocks > * > * {
+    margin-top: 3rem;
+  }
+}
+
+@include small-break {
+  .stack {
+    gap: 2.5rem;
+  }
+
+  .blocks > * > * {
+    margin-top: 2.5rem;
   }
 }
