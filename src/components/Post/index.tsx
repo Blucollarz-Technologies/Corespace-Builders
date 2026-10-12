@@ -8,7 +8,6 @@ import { RenderBlocks } from '@components/RenderBlocks/index'
 import { RichText } from '@components/RichText/index'
 import { Video } from '@components/RichText/Video/index'
 import { getVideo } from '@root/utilities/get-video'
-import { getBlogListingPath } from '@root/utilities/postUrls'
 import { formatDate } from '@utilities/format-date-time'
 import React from 'react'
 
@@ -113,6 +112,7 @@ export const Post: React.FC<Partial<PostType>> = (props) => {
   } = props
 
   const categoryName = typeof category !== 'string' ? category?.name : 'Blog'
+  const categorySlug = typeof category !== 'string' ? category?.slug : 'blog'
   const authorLabel = getAuthorLabel(props)
   const readMinutes = estimateReadTime(props)
 
@@ -146,7 +146,7 @@ export const Post: React.FC<Partial<PostType>> = (props) => {
               ellipsis={false}
               items={[
                 { label: 'Home', url: '/' },
-                { label: categoryName || 'Blog', url: getBlogListingPath() },
+                { label: categoryName, url: `/posts/${categorySlug}` },
                 { label: title },
               ]}
             />

@@ -50,7 +50,7 @@ export const ResourceBlock: React.FC<{ id: string }> = ({ id }) => {
   }, [id])
 
   return (
-    <Link href={`/blog/${resource?.slug}`} target="_blank">
+    <Link href={`/posts/${resource?.category}/${resource?.slug}`} target="_blank">
       <Banner type="success">
         {resource === null ? (
           <span className={classes.skeleton} />

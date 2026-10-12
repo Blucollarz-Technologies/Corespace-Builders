@@ -22,7 +22,7 @@ export const FeaturedBlogPost: React.FC<{ category: string } & Partial<Post>> = 
     title,
   } = props
 
-  const href = `/blog/${slug}`
+  const href = `/posts/${category}/${slug}`
 
   const author =
     authors && authors[0] && typeof authors[0] !== 'string'

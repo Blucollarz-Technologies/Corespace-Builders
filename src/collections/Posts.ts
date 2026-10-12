@@ -329,9 +329,10 @@ export const Posts: CollectionConfig = {
           const revalidatePostPaths = (categorySlug: string, postSlug: string) => {
             revalidateTag(`post_${categorySlug}_${postSlug}`)
             revalidateTag('posts')
-            revalidatePath(`/blog/${postSlug}`)
             revalidatePath(`/posts/${categorySlug}/${postSlug}`)
-            revalidatePath('/blog')
+            if (categorySlug === 'blog') {
+              revalidatePath(`/blog/${postSlug}`)
+            }
           }
 
           if (!category) {
@@ -366,10 +367,11 @@ export const Posts: CollectionConfig = {
             throw new Error('Category not found')
           } else {
             revalidateTag('posts')
-            revalidatePath('/blog')
-            revalidatePath(`/blog/${doc.slug}`)
             revalidatePath(`/posts/${category.slug}`)
             revalidatePath(`/posts/${category.slug}/${doc.slug}`)
+            if (category.slug === 'blog') {
+              revalidatePath(`/blog/${doc.slug}`)
+            }
           }
         } catch (error) {
           console.error(error)

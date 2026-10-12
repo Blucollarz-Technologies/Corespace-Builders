@@ -52,8 +52,7 @@ export const formatPagePath = (
         prefix = '/partners'
         break
       case 'posts':
-        // Public posts use /blog/{slug} (category is not in the path)
-        prefix = '/blog'
+        prefix = `/posts/${category}`
         break
       default:
         prefix = `/${collection}`
