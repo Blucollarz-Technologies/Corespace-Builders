@@ -8,7 +8,9 @@
   overflow-x: clip;
   background: var(--brand-ivory, #f8f4ec);
   color: var(--brand-charcoal, #1e2522);
-  margin-top: var(--page-padding-top);
+  // Top clearance comes from BlockWrapper padding-top: hero
+  // (header height + breathing room). Do not also margin-top or breadcrumbs
+  // sit flush under the black header bar.
 
   &::before {
     content: '';
@@ -44,12 +46,15 @@
   flex-direction: column;
   gap: 0.75rem;
   max-width: 52rem;
+  padding-top: 0.5rem;
 }
 
 .breadcrumbs {
   margin: 0;
+  padding-top: 0.25rem;
   flex-wrap: wrap;
   font-size: 0.875rem;
+  line-height: 1.5;
   color: var(--brand-slate, #5f665f);
 
   a {
@@ -96,16 +101,8 @@
   line-height: 1.65;
   color: var(--brand-slate, #5f665f);
 
-  &:empty {
-    display: none;
-  }
-
   p {
     margin: 0;
-
-    &:empty {
-      display: none;
-    }
   }
 
   strong {

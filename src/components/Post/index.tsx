@@ -89,12 +89,13 @@ function hasMeaningfulExcerpt(excerpt: PostType['excerpt'] | null | undefined): 
   }
 
   const text = getLexicalPlainText(excerpt).replace(/\s+/g, ' ').trim()
-  if (text.length < 3) {
+
+  // Ignore empty / punctuation-only CMS leftovers (e.g. ".")
+  if (!text || text.length < 8 || /^[\s.·•\-–—*…]+$/.test(text)) {
     return false
   }
 
-  // Ignore excerpts that are only punctuation / dots
-  return !/^[\s.·•\-–—*]+$/.test(text)
+  return true
 }
 
 export const Post: React.FC<Partial<PostType>> = (props) => {
@@ -134,7 +135,7 @@ export const Post: React.FC<Partial<PostType>> = (props) => {
   return (
     <BlockWrapper
       className={classes.post}
-      padding={{ bottom: 'small', top: 'small' }}
+      padding={{ bottom: 'small', top: 'hero' }}
       settings={{ background: 'transparent', theme: 'light' }}
       style={{ background: 'var(--brand-ivory, #f8f4ec)' }}
     >
@@ -155,8 +156,9 @@ export const Post: React.FC<Partial<PostType>> = (props) => {
 
             {title && <h1 className={classes.title}>{title}</h1>}
 
-            {excerpt && hasMeaningfulExcerpt(excerpt) ? (
-              <RichText className={classes.excerpt} content={excerpt} />
+            {/* Skip placeholder excerpts (CMS often stores ".") — keeps title → meta tight */}
+            {hasMeaningfulExcerpt(excerpt) ? (
+              <RichText className={classes.excerpt} content={excerpt!} />
             ) : null}
 
             <div className={classes.meta}>
