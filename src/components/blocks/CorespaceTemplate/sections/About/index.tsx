@@ -89,7 +89,7 @@ export const CorespaceAbout: React.FC<CorespaceAboutProps> = ({
           </p>
         )}
 
-        {heading && <h2 className={classes.heading}>{heading}</h2>}
+        {heading && <h1 className={classes.heading}>{heading}</h1>}
 
         {intro && <p className={classes.intro}>{intro}</p>}
 

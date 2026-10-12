@@ -9,18 +9,31 @@ function getLocalDistDir() {
   return path.join(process.env.LOCALAPPDATA || os.tmpdir(), 'Corespace-Builders', 'next-dist')
 }
 
+/**
+ * Next.js joins distDir with the project root on Windows, so absolute paths break
+ * (project\C:\Users\...). Always return a project-relative path.
+ */
 function getNextDistDir() {
   if (process.env.NEXT_DIST_DIR) {
     return process.env.NEXT_DIST_DIR
   }
 
-  // Keep build output inside the project so Next can resolve node_modules correctly.
+  // OneDrive corrupts .next symlinks (EINVAL readlink). Use a cache folder instead.
+  if (isOneDriveProject()) {
+    return path.join('node_modules', '.cache', 'corespace-next')
+  }
+
   return '.next'
 }
 
 /** All dist folders that may exist from older setups (safe to delete). */
 function getNextDistDirsToClean() {
-  const dirs = new Set(['.next', 'node_modules/.cache/next', getLocalDistDir()])
+  const dirs = new Set([
+    '.next',
+    path.join('node_modules', '.cache', 'next'),
+    path.join('node_modules', '.cache', 'corespace-next'),
+    getLocalDistDir(),
+  ])
 
   return [...dirs]
 }

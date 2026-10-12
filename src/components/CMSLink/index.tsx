@@ -1,6 +1,6 @@
 import type { CaseStudy, Page, Post } from '@root/payload-types'
 
-import { resolveCorespaceUrl } from '@root/utilities/resolveCorespaceUrl'
+import { finalizePublicHref } from '@root/utilities/publicHref'
 import Link from 'next/link'
 import React from 'react'
 // eslint-disable-next-line import/no-cycle
@@ -53,8 +53,8 @@ type GenerateSlugType = {
   type?: LinkType | null
   url?: null | string
 }
-const generateHref = (args: GenerateSlugType): string => {
-  const { type, reference, url } = args
+const generateHref = (args: GenerateSlugType & { label?: null | string }): string => {
+  const { type, reference, url, label } = args
 
   let href = ''
 
@@ -81,7 +81,7 @@ const generateHref = (args: GenerateSlugType): string => {
     }
   }
 
-  return resolveCorespaceUrl(href) || ''
+  return finalizePublicHref(href, label)
 }
 
 export const CMSLink: React.FC<CMSLinkType> = ({
@@ -101,7 +101,8 @@ export const CMSLink: React.FC<CMSLinkType> = ({
   reference,
   url,
 }) => {
-  let href = generateHref({ type, reference, url })
+  let href = generateHref({ type, reference, url, label })
+  const openInNewTab = Boolean(newTab) || /wa\.me|whatsapp\.com/i.test(href)
 
   if (!href) {
     return (
@@ -121,7 +122,7 @@ export const CMSLink: React.FC<CMSLinkType> = ({
   if (!appearance) {
     const hrefIsLocal = ['tel:', 'mailto:', '/'].some((prefix) => href.startsWith(prefix))
 
-    if (!hrefIsLocal && href !== '#') {
+    if (!hrefIsLocal && href !== '#' && !/wa\.me|whatsapp\.com/i.test(href)) {
       try {
         const objectURL = new URL(href)
         if (objectURL.origin === process.env.NEXT_PUBLIC_SITE_URL) {
@@ -134,7 +135,7 @@ export const CMSLink: React.FC<CMSLinkType> = ({
       }
     }
 
-    const newTabProps = newTab ? { rel: 'noopener noreferrer', target: '_blank' } : {}
+    const newTabProps = openInNewTab ? { rel: 'noopener noreferrer', target: '_blank' } : {}
 
     if (href.indexOf('/') === 0) {
       return (
@@ -177,7 +178,7 @@ export const CMSLink: React.FC<CMSLinkType> = ({
     href,
     label,
     mobileFullWidth,
-    newTab,
+    newTab: openInNewTab,
     onClick,
     onMouseEnter,
     onMouseLeave,

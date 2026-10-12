@@ -1,5 +1,12 @@
 export const FORM_NOTIFICATION_EMAIL = 'corespacebuilders@gmail.com'
 
+/**
+ * SendGrid "from" address. Must be a verified sender/domain in SendGrid.
+ * Do not use the Gmail inbox as From — Gmail rejects / drops that via API.
+ */
+export const FORM_FROM_EMAIL =
+  process.env.FORM_FROM_EMAIL || 'noreply@corespacebuilders.com'
+
 /** Default success destination for all master lead-form submissions. */
 export const FORM_THANK_YOU_PATH = '/thank-you'
 

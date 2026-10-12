@@ -1,7 +1,10 @@
 import type { Metadata } from 'next'
 
 import { GoogleAnalytics } from '@components/Analytics/GoogleAnalytics/index'
-import { GoogleTagManager } from '@components/Analytics/GoogleTagManager/index'
+import {
+  GoogleTagManagerHead,
+  GoogleTagManagerNoScript,
+} from '@components/Analytics/GoogleTagManager/index'
 import { PrivacyBanner } from '@components/PrivacyBanner/index'
 import { Providers } from '@providers/index'
 import { PrivacyProvider } from '@root/providers/Privacy/index'
@@ -15,16 +18,22 @@ import '../../css/app.scss'
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <PrivacyProvider>
         <head>
+          {/* Google Tag Manager — as high as possible in <head> */}
+          <GoogleTagManagerHead />
           <link href={process.env.NEXT_PUBLIC_SITE_URL} rel="dns-prefetch" />
           <link href="https://www.googletagmanager.com" rel="preconnect" />
           <link href="https://www.google-analytics.com" rel="preconnect" />
           <GoogleAnalytics />
         </head>
-        <body className={[GeistMono.variable, inter.variable].join(' ')}>
-          <GoogleTagManager />
+        <body
+          className={[GeistMono.variable, inter.variable].join(' ')}
+          suppressHydrationWarning
+        >
+          {/* Google Tag Manager (noscript) — immediately after <body> */}
+          <GoogleTagManagerNoScript />
           <Providers>
             {children}
             <PrivacyBanner />

@@ -1,9 +1,20 @@
 # *
 User-agent: *
 Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /auth/
+Disallow: /styleguide/
+Disallow: /cloud
+Disallow: /cloud/
+Disallow: /case-studies
+Disallow: /case-studies/
+Disallow: /cookie
+Disallow: /thank-you
+Disallow: /thanks-for-subscribing
 
 # Host
-Host: http://localhost:3000/
+Host: https://www.corespacebuilders.com
 
 # Sitemaps
-Sitemap: http://localhost:3000/sitemap.xml
+Sitemap: https://www.corespacebuilders.com/sitemap.xml
