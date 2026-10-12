@@ -48,6 +48,55 @@ function estimateReadTime(props: Partial<PostType>): number {
   return Math.max(1, Math.round(words / 200))
 }
 
+function getLexicalPlainText(node: unknown): string {
+  if (node == null) {
+    return ''
+  }
+
+  if (typeof node === 'string') {
+    return node
+  }
+
+  if (Array.isArray(node)) {
+    return node.map(getLexicalPlainText).join('')
+  }
+
+  if (typeof node !== 'object') {
+    return ''
+  }
+
+  const value = node as Record<string, unknown>
+
+  if (typeof value.text === 'string') {
+    return value.text
+  }
+
+  if (value.root) {
+    return getLexicalPlainText(value.root)
+  }
+
+  if (Array.isArray(value.children)) {
+    return value.children.map(getLexicalPlainText).join('')
+  }
+
+  return ''
+}
+
+/** Skip empty / placeholder excerpts (e.g. lone ".") that leave a large header gap. */
+function hasMeaningfulExcerpt(excerpt: PostType['excerpt'] | null | undefined): boolean {
+  if (!excerpt) {
+    return false
+  }
+
+  const text = getLexicalPlainText(excerpt).replace(/\s+/g, ' ').trim()
+  if (text.length < 3) {
+    return false
+  }
+
+  // Ignore excerpts that are only punctuation / dots
+  return !/^[\s.·•\-–—*]+$/.test(text)
+}
+
 export const Post: React.FC<Partial<PostType>> = (props) => {
   const {
     category,
@@ -85,7 +134,7 @@ export const Post: React.FC<Partial<PostType>> = (props) => {
   return (
     <BlockWrapper
       className={classes.post}
-      padding={{ bottom: 'large', top: 'large' }}
+      padding={{ bottom: 'small', top: 'small' }}
       settings={{ background: 'transparent', theme: 'light' }}
       style={{ background: 'var(--brand-ivory, #f8f4ec)' }}
     >
@@ -106,7 +155,9 @@ export const Post: React.FC<Partial<PostType>> = (props) => {
 
             {title && <h1 className={classes.title}>{title}</h1>}
 
-            {excerpt && <RichText className={classes.excerpt} content={excerpt} />}
+            {excerpt && hasMeaningfulExcerpt(excerpt) ? (
+              <RichText className={classes.excerpt} content={excerpt} />
+            ) : null}
 
             <div className={classes.meta}>
               <div className={classes.metaItem}>

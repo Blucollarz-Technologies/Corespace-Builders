@@ -18,7 +18,7 @@ import '../../css/app.scss'
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <PrivacyProvider>
         <head>
           {/* Google Tag Manager — as high as possible in <head> */}
@@ -28,7 +28,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <link href="https://www.google-analytics.com" rel="preconnect" />
           <GoogleAnalytics />
         </head>
-        <body className={[GeistMono.variable, inter.variable].join(' ')}>
+        <body
+          className={[GeistMono.variable, inter.variable].join(' ')}
+          suppressHydrationWarning
+        >
           {/* Google Tag Manager (noscript) — immediately after <body> */}
           <GoogleTagManagerNoScript />
           <Providers>
