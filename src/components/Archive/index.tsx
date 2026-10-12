@@ -110,7 +110,7 @@ export const Archive: React.FC<{ category: Category['slug'] }> = async ({ catego
                       <div className={['cols-8 cols-m-8'].filter(Boolean).join(' ')} key={post.id}>
                         <ContentMediaCard
                           authors={post.authors}
-                          href={`/posts/${category}/${post.slug}`}
+                          href={`/blog/${post.slug}`}
                           media={thumbnailAsset ?? ''}
                           publishedOn={post.publishedOn}
                           title={post.title}
