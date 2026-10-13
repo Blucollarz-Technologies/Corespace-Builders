@@ -9,12 +9,7 @@ export const redirects = async () => {
     },
     {
       // Legacy post URLs → canonical /blog/{slug}
-      source: '/posts/blog/:slug',
-      destination: '/blog/:slug',
-      permanent: true,
-    },
-    {
-      // Other legacy category post URLs also land on /blog/{slug}
+      // Single rule covers /posts/blog/:slug and other categories
       source: '/posts/:category/:slug',
       destination: '/blog/:slug',
       permanent: true,
