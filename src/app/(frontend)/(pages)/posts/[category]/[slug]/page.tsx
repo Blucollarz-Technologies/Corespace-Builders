@@ -32,7 +32,9 @@ const PostPage = async ({
 
   const blogPost = await getPost(slug, category, draft)
 
-  const url = `/${category}/${slug}`
+  // Legacy route — Next redirects send public traffic to /blog/{slug}.
+  // Keep this page for drafts/preview compatibility.
+  const url = `/blog/${slug}`
 
   if (!blogPost) {
     return <PayloadRedirects url={url} />
@@ -108,8 +110,11 @@ export async function generateMetadata({
           ]
         : undefined,
       title: post?.meta?.title ?? undefined,
-      url: `/${category}/${slug}`,
+      url: `/blog/${slug}`,
     }),
+    alternates: {
+      canonical: `/blog/${slug}`,
+    },
     title: post?.meta?.title ?? post?.title ?? undefined,
   }
 }

@@ -10,6 +10,7 @@ Disallow: /cloud/
 Disallow: /case-studies
 Disallow: /case-studies/
 Disallow: /cookie
+Disallow: /posts/
 Disallow: /thank-you
 Disallow: /thanks-for-subscribing
 

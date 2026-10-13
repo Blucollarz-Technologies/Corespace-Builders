@@ -8,11 +8,18 @@ export const redirects = async () => {
       permanent: true,
     },
     {
-      // :slug+ requires a path segment so bare /blog is not redirected to /posts/blog
-      source: '/blog/:slug+',
-      destination: '/posts/blog/:slug*',
+      // Legacy post URLs → canonical /blog/{slug}
+      source: '/posts/blog/:slug',
+      destination: '/blog/:slug',
       permanent: true,
     },
+    {
+      // Other legacy category post URLs also land on /blog/{slug}
+      source: '/posts/:category/:slug',
+      destination: '/blog/:slug',
+      permanent: true,
+    },
+
     {
       // Homepage CMS slug must not remain a duplicate indexable URL
       source: '/home',

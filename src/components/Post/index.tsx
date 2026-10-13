@@ -147,7 +147,7 @@ export const Post: React.FC<Partial<PostType>> = (props) => {
               ellipsis={false}
               items={[
                 { label: 'Home', url: '/' },
-                { label: categoryName, url: `/posts/${categorySlug}` },
+                { label: categoryName || 'Blog', url: '/blog' },
                 { label: title },
               ]}
             />
