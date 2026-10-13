@@ -113,7 +113,6 @@ export const Post: React.FC<Partial<PostType>> = (props) => {
   } = props
 
   const categoryName = typeof category !== 'string' ? category?.name : 'Blog'
-  const categorySlug = typeof category !== 'string' ? category?.slug : 'blog'
   const authorLabel = getAuthorLabel(props)
   const readMinutes = estimateReadTime(props)
 
