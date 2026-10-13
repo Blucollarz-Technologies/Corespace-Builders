@@ -873,6 +873,10 @@ export interface Category {
   slug: string;
   headline: string;
   description: string;
+  /**
+   * Featured article for this category archive. Leave empty to feature the newest published post. Latest articles below always sort by publication date.
+   */
+  featuredPost?: (string | null) | Post;
   posts?: {
     docs?: (string | Post)[];
     hasNextPage?: boolean;
@@ -4950,6 +4954,7 @@ export interface CategoriesSelect<T extends boolean = true> {
   slug?: T;
   headline?: T;
   description?: T;
+  featuredPost?: T;
   posts?: T;
   updatedAt?: T;
   createdAt?: T;

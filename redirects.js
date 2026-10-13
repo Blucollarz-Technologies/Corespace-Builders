@@ -14,6 +14,13 @@ export const redirects = async () => {
       destination: '/blog/:slug',
       permanent: true,
     },
+    {
+      // Default category archive lives at /blog
+      source: '/posts/blog',
+      destination: '/blog',
+      permanent: true,
+    },
+
 
     {
       // Homepage CMS slug must not remain a duplicate indexable URL

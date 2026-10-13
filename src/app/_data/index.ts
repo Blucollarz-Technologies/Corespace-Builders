@@ -188,6 +188,7 @@ export const fetchArchive = async (slug: string, draft?: boolean): Promise<Parti
       name: true,
       slug: true,
       description: true,
+      featuredPost: true,
       headline: true,
       posts: true,
     },
@@ -200,13 +201,26 @@ export const fetchArchive = async (slug: string, draft?: boolean): Promise<Parti
 
 export const fetchArchives = async (slug?: string): Promise<Partial<Category>[]> => {
   const payload = await getPayload({ config })
+  const currentDate = new Date()
 
   const data = await payload.find({
     collection: 'categories',
     depth: 0,
+    joins: {
+      posts: {
+        limit: 1,
+        where: {
+          and: [
+            { publishedOn: { less_than_equal: currentDate } },
+            { _status: { equals: 'published' } },
+          ],
+        },
+      },
+    },
     select: {
       name: true,
       slug: true,
+      posts: true,
     },
     sort: 'name',
     ...(slug && {
@@ -218,10 +232,14 @@ export const fetchArchives = async (slug?: string): Promise<Partial<Category>[]>
     }),
   })
 
-  return data.docs
+  // Only categories that have at least one published post (skip empty / leftover tabs)
+  return data.docs.filter((category) => (category.posts?.docs?.length ?? 0) > 0)
 }
 
-export const fetchBlogPost = async (slug: string, category): Promise<Partial<Post>> => {
+export const fetchBlogPost = async (
+  slug: string,
+  category?: string | null,
+): Promise<Partial<Post>> => {
   const { isEnabled: draft } = await draftMode()
   const payload = await getPayload({ config })
 
@@ -251,7 +269,7 @@ export const fetchBlogPost = async (slug: string, category): Promise<Partial<Pos
     where: {
       and: [
         { slug: { equals: slug } },
-        { 'category.slug': { equals: category } },
+        ...(category ? [{ 'category.slug': { equals: category } }] : []),
         ...(draft
           ? []
           : [

@@ -10,7 +10,7 @@ import type { ContentMediaCardProps } from '../types'
 import classes from './index.module.scss'
 
 export const ContentMediaCard: React.FC<ContentMediaCardProps> = (props) => {
-  const { authors, className, href, media, publishedOn, style, title } = props
+  const { authors, className, description, href, media, publishedOn, style, title } = props
 
   const author =
     typeof authors === 'string'
@@ -57,6 +57,7 @@ export const ContentMediaCard: React.FC<ContentMediaCardProps> = (props) => {
           </div>
 
           <h2 className={classes.title}>{title}</h2>
+          {description ? <p className={classes.description}>{description}</p> : null}
         </div>
       </div>
       <BackgroundScanline className={classes.scanline} />

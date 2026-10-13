@@ -10,15 +10,13 @@ import { unstable_cache } from 'next/cache'
 import { draftMode } from 'next/headers'
 import React from 'react'
 
-const DEFAULT_CATEGORY = 'blog'
-
 const getPost = async (slug: string, draft?: boolean) => {
   if (draft) {
-    return fetchBlogPost(slug, DEFAULT_CATEGORY)
+    return fetchBlogPost(slug)
   }
 
-  return unstable_cache(() => fetchBlogPost(slug, DEFAULT_CATEGORY), ['blogPost', DEFAULT_CATEGORY, slug], {
-    tags: [`post_${DEFAULT_CATEGORY}_${slug}`, 'posts'],
+  return unstable_cache(() => fetchBlogPost(slug), ['blogPost', slug], {
+    tags: [`post_${slug}`, 'posts'],
   })()
 }
 
@@ -55,13 +53,8 @@ export async function generateStaticParams() {
   const posts = await getPosts()
 
   return posts
-    .map(({ slug, category }) => {
+    .map(({ slug }) => {
       if (!slug) {
-        return null
-      }
-
-      // Canonical public posts live under /blog/{slug}
-      if (category && typeof category !== 'string' && category.slug && category.slug !== 'blog') {
         return null
       }
 

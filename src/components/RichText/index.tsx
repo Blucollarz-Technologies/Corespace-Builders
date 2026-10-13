@@ -58,6 +58,7 @@ import { Arrow } from './Arrow'
 import { BulletList } from './BulletList'
 import { Card } from './Card/index'
 import { CardGroup } from './CardGroup/index'
+import { BlogHeading } from './BlogHeading'
 import { Heading as HeadingComponent } from './Heading'
 import { LightDarkImage } from './LightDarkImage/index'
 import { PayloadMediaBlock } from './PayloadMedia'
@@ -72,6 +73,8 @@ import { VideoDrawer } from './VideoDrawer'
 type Props = {
   className?: string
   content: any
+  /** When true, headings get anchor ids for in-page TOC navigation. */
+  toc?: boolean
 }
 
 export type NodeTypes =
@@ -102,8 +105,11 @@ export type NodeTypes =
   | SerializedLabelNode
   | SerializedLargeBodyNode
 
-export const jsxConverters: (args: { toc?: boolean }) => JSXConvertersFunction<NodeTypes> =
-  ({ toc }) =>
+export const jsxConverters: (args: {
+  headingStyle?: 'blog' | 'docs'
+  toc?: boolean
+}) => JSXConvertersFunction<NodeTypes> =
+  ({ headingStyle = 'docs', toc }) =>
   ({ defaultConverters }) => {
     const converters: JSXConverters<NodeTypes> = {
       ...defaultConverters,
@@ -259,13 +265,13 @@ export const jsxConverters: (args: { toc?: boolean }) => JSXConvertersFunction<N
     }
 
     if (toc) {
-      converters.heading = HeadingComponent as any
+      converters.heading = (headingStyle === 'blog' ? BlogHeading : HeadingComponent) as any
     }
 
     return converters
   }
 
-export const RichText: React.FC<Props> = ({ className, content }) => {
+export const RichText: React.FC<Props> = ({ className, content, toc = false }) => {
   if (!content) {
     return null
   }
@@ -273,7 +279,7 @@ export const RichText: React.FC<Props> = ({ className, content }) => {
   return (
     <SerializedRichText
       className={['payload-richtext', className].filter(Boolean).join(' ')}
-      converters={jsxConverters({ toc: false })}
+      converters={jsxConverters({ headingStyle: toc ? 'blog' : 'docs', toc })}
       data={content}
     />
   )

@@ -369,6 +369,9 @@ export const Posts: CollectionConfig = {
             revalidatePath('/blog')
             revalidatePath(`/blog/${doc.slug}`)
             revalidatePath(`/posts/${category.slug}`)
+            if (category.slug === 'blog') {
+              revalidatePath('/blog')
+            }
             revalidatePath(`/posts/${category.slug}/${doc.slug}`)
           }
         } catch (error) {

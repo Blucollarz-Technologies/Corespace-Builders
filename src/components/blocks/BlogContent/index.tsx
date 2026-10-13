@@ -13,10 +13,10 @@ export const BlogContent: React.FC<{ disableGutter: boolean } & Props> = ({
   return (
     <>
       {disableGutter ? (
-        <RichText content={blogContentFields.richText} />
+        <RichText content={blogContentFields.richText} toc />
       ) : (
         <Gutter>
-          <RichText content={blogContentFields.richText} />
+          <RichText content={blogContentFields.richText} toc />
         </Gutter>
       )}
     </>

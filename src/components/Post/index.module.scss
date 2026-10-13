@@ -187,6 +187,11 @@
   width: 100%;
   min-width: 0;
 
+  // Offset sticky site header when jumping from TOC anchors
+  :global(h2[id]) {
+    scroll-margin-top: calc(var(--header-height, 4.5rem) + 1.25rem);
+  }
+
   > * > * {
     margin-top: 2rem;
 

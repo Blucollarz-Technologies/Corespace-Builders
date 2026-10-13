@@ -8,10 +8,15 @@ import { RenderBlocks } from '@components/RenderBlocks/index'
 import { RichText } from '@components/RichText/index'
 import { Video } from '@components/RichText/Video/index'
 import { getVideo } from '@root/utilities/get-video'
+import {
+  extractPostH2Headings,
+  MIN_TOC_HEADINGS,
+} from '@root/utilities/extractPostH2Headings'
 import { formatDate } from '@utilities/format-date-time'
 import React from 'react'
 
 import classes from './index.module.scss'
+import { TableOfContents } from './TableOfContents/index'
 
 function getAuthorLabel(props: Partial<PostType>): string {
   if (props.authorType === 'guest' && props.guestAuthor) {
@@ -131,6 +136,9 @@ export const Post: React.FC<Partial<PostType>> = (props) => {
         )
       : videoUrl && <Video {...getVideo(videoUrl)} />
 
+  const tocItems = extractPostH2Headings(content)
+  const showToc = tocItems.length >= MIN_TOC_HEADINGS
+
   return (
     <BlockWrapper
       className={classes.post}
@@ -208,6 +216,8 @@ export const Post: React.FC<Partial<PostType>> = (props) => {
           </header>
 
           {heroMedia && <div className={classes.heroImageWrap}>{heroMedia}</div>}
+
+          {showToc ? <TableOfContents items={tocItems} title={title} /> : null}
 
           <div className={classes.blocks}>
             <RenderBlocks

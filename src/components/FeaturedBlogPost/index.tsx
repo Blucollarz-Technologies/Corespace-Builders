@@ -2,6 +2,8 @@ import type { Post } from '@root/payload-types'
 
 import { BackgroundScanline } from '@components/BackgroundScanline/index'
 import { Media } from '@components/Media/index'
+import { getBlogPostPath } from '@root/utilities/postUrls'
+import { getPostCardDescription } from '@root/utilities/getPostCardDescription'
 import { formatDate } from '@utilities/format-date-time'
 import Link from 'next/link'
 import * as React from 'react'
@@ -16,13 +18,13 @@ export const FeaturedBlogPost: React.FC<{ category: string } & Partial<Post>> = 
     dynamicThumbnail,
     featuredMedia,
     image,
-    meta,
     publishedOn,
     thumbnail,
     title,
   } = props
 
-  const href = `/blog/${slug}`
+  const href = getBlogPostPath(slug || '')
+  const description = getPostCardDescription(props)
 
   const author =
     authors && authors[0] && typeof authors[0] !== 'string'
@@ -59,7 +61,7 @@ export const FeaturedBlogPost: React.FC<{ category: string } & Partial<Post>> = 
             {author && <p className={classes.author}>{author}</p>}
           </div>
 
-          <p className={classes.description}>{meta?.description}</p>
+          {description ? <p className={classes.description}>{description}</p> : null}
         </div>
       </div>
     </Link>
