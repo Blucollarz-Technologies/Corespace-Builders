@@ -9,16 +9,17 @@ export const redirects = async () => {
     },
     {
       // Legacy post URLs → canonical /blog/{slug}
-      // Single rule covers /posts/blog/:slug and other categories
+      // Use temporary (307) so browsers do not permanently cache a redirect loop
+      // against an older reverse /blog → /posts rule still in local cache.
       source: '/posts/:category/:slug',
       destination: '/blog/:slug',
-      permanent: true,
+      permanent: false,
     },
     {
       // Default category archive lives at /blog
       source: '/posts/blog',
       destination: '/blog',
-      permanent: true,
+      permanent: false,
     },
 
 
