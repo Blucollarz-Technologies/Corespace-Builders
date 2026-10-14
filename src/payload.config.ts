@@ -23,7 +23,6 @@ import { LabelFeature } from '@root/fields/richText/features/label/server'
 import { LargeBodyFeature } from '@root/fields/richText/features/largeBody/server'
 import { googleAnalytics } from '@zubricks/plugin-google-analytics'
 import { revalidateTag } from 'next/cache'
-import nodemailerSendgrid from 'nodemailer-sendgrid'
 import path from 'path'
 import { buildConfig, type TextField } from 'payload'
 import { fileURLToPath } from 'url'
@@ -94,13 +93,23 @@ import { FORM_FROM_EMAIL, FORM_NOTIFICATION_EMAIL } from './utilities/formTracki
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
-const sendGridAPIKey = process.env.SENDGRID_API_KEY
+const resendAPIKey = process.env.RESEND_API_KEY
 
-const sendgridConfig = {
-  transportOptions: nodemailerSendgrid({
-    apiKey: sendGridAPIKey,
-  }),
-}
+/** Resend SMTP — see https://resend.com/docs/send-with-nodemailer-smtp */
+const resendTransport =
+  resendAPIKey
+    ? {
+        transportOptions: {
+          auth: {
+            pass: resendAPIKey,
+            user: 'resend',
+          },
+          host: 'smtp.resend.com',
+          port: 465,
+          secure: true,
+        },
+      }
+    : {}
 
 export default buildConfig({
   admin: {
@@ -395,11 +404,11 @@ export default buildConfig({
     ],
   }),
   email: nodemailerAdapter({
-    // From must be a SendGrid-verified identity (domain or single sender).
+    // From must be a Resend-verified domain or sender.
     // Lead notifications still go TO corespacebuilders@gmail.com below.
     defaultFromAddress: FORM_FROM_EMAIL,
     defaultFromName: 'Corespace Builders',
-    ...sendgridConfig,
+    ...resendTransport,
   }),
   endpoints: [
     {
