@@ -53,6 +53,16 @@
   }
 }
 
+.description {
+  margin: 0;
+  opacity: 0.75;
+  @include body;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 .media {
   max-width: 50%;
   position: relative;

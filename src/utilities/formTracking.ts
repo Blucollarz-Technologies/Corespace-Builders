@@ -1,8 +1,8 @@
 export const FORM_NOTIFICATION_EMAIL = 'corespacebuilders@gmail.com'
 
 /**
- * SendGrid "from" address. Must be a verified sender/domain in SendGrid.
- * Do not use the Gmail inbox as From — Gmail rejects / drops that via API.
+ * Resend "from" address. Must be a verified sender/domain in Resend.
+ * Do not use the Gmail inbox as From — use a domain sender instead.
  */
 export const FORM_FROM_EMAIL =
   process.env.FORM_FROM_EMAIL || 'noreply@corespacebuilders.com'

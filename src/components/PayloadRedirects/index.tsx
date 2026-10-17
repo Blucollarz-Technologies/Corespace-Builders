@@ -1,13 +1,23 @@
-import type { CaseStudy, Page, Post } from '@types'
 import type React from 'react'
 
 import { getCachedDocument } from '@utilities/getDocument'
 import { getCachedRedirects } from '@utilities/getRedirects'
+import { resolveCorespaceUrl } from '@root/utilities/resolveCorespaceUrl'
 import { notFound, redirect } from 'next/navigation'
 
 interface Props {
   disableNotFound?: boolean
   url: string
+}
+
+function normalizeRedirectPath(path: string): string {
+  const resolved = resolveCorespaceUrl(path) || path
+  // Never bounce canonical /blog/{slug} back to legacy /posts/...
+  const legacyPost = resolved.match(/^\/posts\/[^/]+\/([^/]+)\/?$/)
+  if (legacyPost) {
+    return `/blog/${legacyPost[1]}`
+  }
+  return resolved
 }
 
 /* This component helps us with SSR based dynamic redirects */
@@ -20,7 +30,10 @@ export const PayloadRedirects: React.FC<Props> = async ({ disableNotFound, url }
 
   if (redirectItem) {
     if (redirectItem.to?.url) {
-      redirect(redirectItem.to.url)
+      const destination = normalizeRedirectPath(redirectItem.to.url)
+      if (destination && destination !== slug) {
+        redirect(destination)
+      }
     }
 
     let redirectUrl: string
@@ -46,7 +59,10 @@ export const PayloadRedirects: React.FC<Props> = async ({ disableNotFound, url }
     }
 
     if (redirectUrl) {
-      redirect(redirectUrl)
+      const destination = normalizeRedirectPath(redirectUrl)
+      if (destination && destination !== slug) {
+        redirect(destination)
+      }
     }
   }
 

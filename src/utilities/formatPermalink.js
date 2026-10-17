@@ -24,7 +24,9 @@ export const formatPermalink = (reference) => {
       }
     }
 
-    if (relationTo !== 'pages') {
+    if (relationTo === 'posts') {
+      permalink = `/blog/${referenceSlug}`
+    } else if (relationTo !== 'pages') {
       permalink = `/${relationTo}/${referenceSlug}`
 
       if (relationTo === 'media') {

@@ -47,7 +47,7 @@ export const RelatedPosts: React.FC<RelatedPostsBlock> = (props) => {
                   <div className={['cols-8 cols-m-8'].filter(Boolean).join(' ')} key={post.id}>
                     <ContentMediaCard
                       authors={post.authorType === 'team' ? post.authors : post.guestAuthor}
-                      href={`/posts/${postCategory}/${post.slug}`}
+                      href={`/blog/${post.slug}`}
                       media={thumbnailAsset ?? ''}
                       publishedOn={post.publishedOn}
                       style={style}

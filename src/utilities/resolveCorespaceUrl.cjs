@@ -94,6 +94,12 @@ function resolveCorespaceUrl(url) {
     return `/project/${path.slice('/projects/'.length)}`
   }
 
+  // /posts/{category}/{slug} → /blog/{slug}
+  const legacyPostMatch = path.match(/^\/posts\/[^/]+\/([^/]+)\/?$/)
+  if (legacyPostMatch) {
+    return `/blog/${legacyPostMatch[1]}`
+  }
+
   return path
 }
 

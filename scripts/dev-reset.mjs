@@ -1,12 +1,11 @@
 import { execSync } from 'node:child_process'
-import { existsSync, rmSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import path from 'node:path'
 import { setTimeout as sleep } from 'node:timers/promises'
 import { fileURLToPath } from 'node:url'
 
 const require = createRequire(import.meta.url)
-const { getNextDistDirsToClean } = require('../next-dist-dir.cjs')
+const { getNextDistDirsToClean, removeDirSafe } = require('../next-dist-dir.cjs')
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 
@@ -28,17 +27,17 @@ function killPort(port) {
         continue
       }
 
-      const pid = line.trim().split(/\s+/).at(-1)
+      const processId = line.trim().split(/\s+/).at(-1)
 
-      if (pid && pid !== '0') {
-        pids.add(pid)
+      if (processId && processId !== '0') {
+        pids.add(processId)
       }
     }
 
-    for (const pid of pids) {
+    for (const processId of pids) {
       try {
-        execSync(`taskkill /PID ${pid} /F /T`, { stdio: 'ignore' })
-        console.log(`Stopped process on port ${port} (PID ${pid})`)
+        execSync(`taskkill /PID ${processId} /F /T`, { stdio: 'ignore' })
+        console.log(`Stopped process on port ${port} (PID ${processId})`)
       } catch {
         // Process may already be gone.
       }
@@ -49,33 +48,18 @@ function killPort(port) {
 }
 
 function cleanNextDirs() {
-  for (const relativeOrAbsolutePath of getNextDistDirsToClean()) {
-    const target = path.isAbsolute(relativeOrAbsolutePath)
-      ? relativeOrAbsolutePath
-      : path.join(root, relativeOrAbsolutePath)
-
-    if (!existsSync(target)) {
-      continue
-    }
-
-    try {
-      rmSync(target, { recursive: true, force: true })
+  for (const target of getNextDistDirsToClean(root)) {
+    if (removeDirSafe(target)) {
       console.log(`Removed ${target}`)
-    } catch (error) {
-      console.warn(`Could not remove ${target}:`, error.message)
     }
   }
 }
 
 async function main() {
   killPort(3000)
-
-  // Give Windows a moment to release the port and file handles.
   await sleep(1500)
-
   cleanNextDirs()
-
-  console.log('Next.js cache cleared. Starting dev server...')
+  console.log('Next.js cache cleared.')
 }
 
 await main()

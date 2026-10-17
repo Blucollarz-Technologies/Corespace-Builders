@@ -19,27 +19,27 @@ import '../../css/app.scss'
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <PrivacyProvider>
-        <head>
-          {/* Google Tag Manager — as high as possible in <head> */}
-          <GoogleTagManagerHead />
-          <link href={process.env.NEXT_PUBLIC_SITE_URL} rel="dns-prefetch" />
-          <link href="https://www.googletagmanager.com" rel="preconnect" />
-          <link href="https://www.google-analytics.com" rel="preconnect" />
+      <head>
+        {/* Google Tag Manager — as high as possible in <head> */}
+        <GoogleTagManagerHead />
+        <link href={process.env.NEXT_PUBLIC_SITE_URL} rel="dns-prefetch" />
+        <link href="https://www.googletagmanager.com" rel="preconnect" />
+        <link href="https://www.google-analytics.com" rel="preconnect" />
+      </head>
+      <body
+        className={[GeistMono.variable, inter.variable].join(' ')}
+        suppressHydrationWarning
+      >
+        {/* Google Tag Manager (noscript) — immediately after <body> */}
+        <GoogleTagManagerNoScript />
+        <PrivacyProvider>
           <GoogleAnalytics />
-        </head>
-        <body
-          className={[GeistMono.variable, inter.variable].join(' ')}
-          suppressHydrationWarning
-        >
-          {/* Google Tag Manager (noscript) — immediately after <body> */}
-          <GoogleTagManagerNoScript />
           <Providers>
             {children}
             <PrivacyBanner />
           </Providers>
-        </body>
-      </PrivacyProvider>
+        </PrivacyProvider>
+      </body>
     </html>
   )
 }

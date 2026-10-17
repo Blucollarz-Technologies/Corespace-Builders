@@ -20,7 +20,7 @@ export const MobileNav = ({
         <Accordion.Trigger asChild>
           <div className={classes.mobileNavTrigger}>
             <span>
-              Posts <span className={classes.divider}>/</span> {currentCategory}
+              Blog <span className={classes.divider}>/</span> {currentCategory}
             </span>{' '}
             <ChevronDownIcon className={classes.chevron} />
           </div>

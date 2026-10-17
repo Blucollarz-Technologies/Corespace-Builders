@@ -1,8 +1,9 @@
+const fs = require('node:fs')
 const os = require('node:os')
 const path = require('node:path')
 
-function isOneDriveProject() {
-  return process.platform === 'win32' && process.cwd().toLowerCase().includes('onedrive')
+function isOneDriveProject(cwd = process.cwd()) {
+  return process.platform === 'win32' && cwd.toLowerCase().includes('onedrive')
 }
 
 function getLocalDistDir() {
@@ -10,32 +11,52 @@ function getLocalDistDir() {
 }
 
 /**
- * Next.js joins distDir with the project root on Windows, so absolute paths break
- * (project\C:\Users\...). Always return a project-relative path.
+ * Keep distDir inside the project. Moving it outside OneDrive breaks ESM
+ * package resolution for Payload/Next.
+ *
+ * OneDrive EINVAL: wipe `.next` before each `bun run dev` (see prepare-dev.mjs).
  */
 function getNextDistDir() {
   if (process.env.NEXT_DIST_DIR) {
     return process.env.NEXT_DIST_DIR
   }
 
-  // OneDrive corrupts .next symlinks (EINVAL readlink). Use a cache folder instead.
-  if (isOneDriveProject()) {
-    return path.join('node_modules', '.cache', 'corespace-next')
-  }
-
   return '.next'
 }
 
-/** All dist folders that may exist from older setups (safe to delete). */
-function getNextDistDirsToClean() {
-  const dirs = new Set([
-    '.next',
-    path.join('node_modules', '.cache', 'next'),
-    path.join('node_modules', '.cache', 'corespace-next'),
+function getNextDistDirsToClean(projectRoot = process.cwd()) {
+  return [
+    path.join(projectRoot, '.next'),
+    path.join(projectRoot, 'node_modules', '.cache', 'next'),
+    path.join(projectRoot, 'node_modules', '.cache', 'corespace-next'),
+    // Legacy leftover from earlier workarounds
     getLocalDistDir(),
-  ])
-
-  return [...dirs]
+  ]
 }
 
-module.exports = { getLocalDistDir, getNextDistDir, getNextDistDirsToClean, isOneDriveProject }
+function removeDirSafe(targetPath) {
+  if (!fs.existsSync(targetPath)) {
+    return false
+  }
+
+  try {
+    const stat = fs.lstatSync(targetPath)
+    if (stat.isSymbolicLink()) {
+      fs.rmdirSync(targetPath)
+      return true
+    }
+  } catch {
+    // fall through
+  }
+
+  fs.rmSync(targetPath, { recursive: true, force: true, maxRetries: 5 })
+  return true
+}
+
+module.exports = {
+  getLocalDistDir,
+  getNextDistDir,
+  getNextDistDirsToClean,
+  isOneDriveProject,
+  removeDirSafe,
+}

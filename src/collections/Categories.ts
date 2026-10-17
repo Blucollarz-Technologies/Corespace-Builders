@@ -51,6 +51,27 @@ export const Categories: CollectionConfig = {
       required: true,
     },
     {
+      name: 'featuredPost',
+      type: 'relationship',
+      admin: {
+        description:
+          'Featured article for this category archive. Leave empty to feature the newest published post. Latest articles below always sort by publication date.',
+      },
+      filterOptions: ({ id }) => {
+        if (!id) {
+          return true
+        }
+
+        return {
+          category: {
+            equals: id,
+          },
+        }
+      },
+      label: 'Featured article',
+      relationTo: 'posts',
+    },
+    {
       name: 'posts',
       type: 'join',
       collection: 'posts',
@@ -63,21 +84,31 @@ export const Categories: CollectionConfig = {
   forceSelect: {
     name: true,
     slug: true,
+    featuredPost: true,
   },
   hooks: {
     afterChange: [
       async ({ doc, previousDoc }) => {
         revalidatePath(`/posts/${doc.slug}`)
+        if (doc.slug === 'blog') {
+          revalidatePath('/blog')
+        }
         revalidateTag('archives')
 
         if (doc.slug !== previousDoc?.slug) {
           revalidatePath(`/posts/${previousDoc?.slug}`)
+          if (previousDoc?.slug === 'blog') {
+            revalidatePath('/blog')
+          }
         }
       },
     ],
     afterDelete: [
       async ({ doc }) => {
         revalidatePath(`/posts/${doc.slug}`)
+        if (doc.slug === 'blog') {
+          revalidatePath('/blog')
+        }
         revalidateTag('archives')
       },
     ],

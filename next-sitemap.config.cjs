@@ -44,7 +44,7 @@ const EXCLUDE = [
   // Canonical duplicates
   '/home',
   '/privacy-policy',
-  '/posts/blog', // listing; keep /blog + /posts/blog/*
+  '/posts/*', // legacy post URLs; canonical is /blog/{slug}
   '/services/*', // redirect duplicates of /service/*
   '/projects/*', // redirect duplicates of /project/*
 ]
@@ -64,7 +64,6 @@ module.exports = {
     if (
       path === '/home' ||
       path === '/privacy-policy' ||
-      path === '/posts/blog' ||
       path === '/cookie' ||
       path === '/api/star-count' ||
       path === '/gh' ||
@@ -78,6 +77,7 @@ module.exports = {
       path.startsWith('/cloud') ||
       path.startsWith('/services/') ||
       path.startsWith('/projects/') ||
+      path.startsWith('/posts/') ||
       path.startsWith('/case-studies') ||
       path.startsWith('/icon') ||
       /\.(svg|ico|png|jpe?g|webp|gif|txt|xml|json|map)$/i.test(path)
@@ -107,6 +107,7 @@ module.exports = {
           '/case-studies',
           '/case-studies/',
           '/cookie',
+          '/posts/',
           '/thank-you',
           '/thanks-for-subscribing',
         ],

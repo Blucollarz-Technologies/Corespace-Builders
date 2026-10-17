@@ -1,8 +1,9 @@
 import { Archive } from '@components/Archive'
 import { fetchArchive, fetchArchives } from '@data'
+import { getBlogListingPath } from '@root/utilities/postUrls'
 import { unstable_cache } from 'next/cache'
 import { draftMode } from 'next/headers'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import React from 'react'
 
 export default async ({
@@ -13,6 +14,12 @@ export default async ({
   }>
 }) => {
   const { category } = await params
+
+  // Canonical listing for the default blog category
+  if (category === 'blog') {
+    redirect(getBlogListingPath())
+  }
+
   const { isEnabled: draft } = await draftMode()
   const archive = draft
     ? await fetchArchive(category, draft)
@@ -46,6 +53,6 @@ export const generateMetadata = async ({ params }: { params: Promise<{ category:
 
   return {
     description,
-    title: `${name} | Payload`,
+    title: name || 'Blog',
   }
 }

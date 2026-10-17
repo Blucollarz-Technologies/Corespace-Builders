@@ -8,11 +8,21 @@ export const redirects = async () => {
       permanent: true,
     },
     {
-      // :slug+ requires a path segment so bare /blog is not redirected to /posts/blog
-      source: '/blog/:slug+',
-      destination: '/posts/blog/:slug*',
-      permanent: true,
+      // Legacy post URLs → canonical /blog/{slug}
+      // Use temporary (307) so browsers do not permanently cache a redirect loop
+      // against an older reverse /blog → /posts rule still in local cache.
+      source: '/posts/:category/:slug',
+      destination: '/blog/:slug',
+      permanent: false,
     },
+    {
+      // Default category archive lives at /blog
+      source: '/posts/blog',
+      destination: '/blog',
+      permanent: false,
+    },
+
+
     {
       // Homepage CMS slug must not remain a duplicate indexable URL
       source: '/home',
