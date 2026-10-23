@@ -15,7 +15,7 @@ Disallow: /thank-you
 Disallow: /thanks-for-subscribing
 
 # Host
-Host: https://www.corespacebuilders.com
+Host: http://localhost:3000/
 
 # Sitemaps
-Sitemap: https://www.corespacebuilders.com/sitemap.xml
+Sitemap: http://localhost:3000/sitemap.xml
