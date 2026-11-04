@@ -100,7 +100,8 @@ export const Pages: CollectionConfig = {
   hooks: {
     afterChange: [
       ({ doc, previousDoc }) => {
-        if (doc._status === 'published' || doc._status !== previousDoc._status) {
+        // Always refresh when a published page is saved (layout/blocks edits included)
+        if (doc._status === 'published' || doc._status !== previousDoc?._status) {
           const path = formatPagePath('pages', doc) || '/'
           const tagKey =
             doc.slug === 'home'
@@ -110,6 +111,8 @@ export const Pages: CollectionConfig = {
           revalidateTag('pages')
           revalidateTag(`page_${tagKey}`)
           revalidatePath(path)
+          revalidatePath(path, 'page')
+          revalidatePath(path, 'layout')
           console.log(`Revalidated: ${path} (tag: page_${tagKey})`)
 
           const isServiceChild =
