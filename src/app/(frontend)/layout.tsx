@@ -19,9 +19,9 @@ import '../../css/app.scss'
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      {/* beforeInteractive Script must live in root layout — Next injects it early into <head> */}
+      <GoogleTagManagerHead />
       <head>
-        {/* Google Tag Manager — as high as possible in <head> */}
-        <GoogleTagManagerHead />
         <link href={process.env.NEXT_PUBLIC_SITE_URL} rel="dns-prefetch" />
         <link href="https://www.googletagmanager.com" rel="preconnect" />
         <link href="https://www.google-analytics.com" rel="preconnect" />
@@ -30,7 +30,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         className={[GeistMono.variable, inter.variable].join(' ')}
         suppressHydrationWarning
       >
-        {/* Google Tag Manager (noscript) — immediately after <body> */}
+        {/* Google Tag Manager (noscript) — first child of body */}
         <GoogleTagManagerNoScript />
         <PrivacyProvider>
           <GoogleAnalytics />
