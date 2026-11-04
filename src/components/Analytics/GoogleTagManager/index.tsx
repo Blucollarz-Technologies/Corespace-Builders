@@ -1,4 +1,3 @@
-import Script from 'next/script'
 import React from 'react'
 
 /** Live GTM container — override with NEXT_PUBLIC_GTM_MEASUREMENT_ID if needed. */
@@ -6,29 +5,22 @@ export const GTM_ID =
   process.env.NEXT_PUBLIC_GTM_MEASUREMENT_ID?.trim() || 'GTM-M54MD6F2'
 
 /**
- * Official GTM head snippet.
- * `beforeInteractive` injects into the initial HTML before hydration so Tag Assistant
- * can see the container in view-source (afterInteractive is flagged as incorrect).
+ * Official GTM head snippet as a native <script>.
+ * Do NOT use next/script — beforeInteractive wraps code in self.__next_s.push(...),
+ * which Tag Assistant does not recognize as a Google tag.
  */
 export const GoogleTagManagerHead: React.FC = () => {
   if (!GTM_ID) {
     return null
   }
 
-  // Exact Google container snippet (single line — matches GTM UI install copy)
   const snippet = `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${GTM_ID}');`
 
-  return (
-    <Script
-      id="gtm"
-      strategy="beforeInteractive"
-      dangerouslySetInnerHTML={{ __html: snippet }}
-    />
-  )
+  return <script dangerouslySetInnerHTML={{ __html: snippet }} />
 }
 
 /**
- * Official GTM noscript — first child of <body> (exact Google markup).
+ * Official GTM noscript — first child of <body>.
  */
 export const GoogleTagManagerNoScript: React.FC = () => {
   if (!GTM_ID) {
