@@ -9,11 +9,11 @@ import classes from './index.module.scss'
 
 type GalleryCategory =
   | 'architecture'
-  | 'homes'
-  | 'homestays'
+  | 'construction'
+  | 'cost-guide'
+  | 'homestay-villa'
   | 'interiors'
-  | 'renovation'
-  | 'villas'
+  | 'projects'
 
 type GalleryStage = 'before' | 'completed' | 'during'
 
@@ -36,12 +36,12 @@ export type CorespaceProjectGalleryProps = {
 
 const CATEGORY_FILTERS: { label: string; value: 'all' | GalleryCategory }[] = [
   { label: 'All', value: 'all' },
-  { label: 'Homes', value: 'homes' },
-  { label: 'Villas', value: 'villas' },
-  { label: 'Homestays', value: 'homestays' },
-  { label: 'Renovation', value: 'renovation' },
+  { label: 'Construction', value: 'construction' },
   { label: 'Architecture', value: 'architecture' },
   { label: 'Interiors', value: 'interiors' },
+  { label: 'Projects', value: 'projects' },
+  { label: 'Homestay & Villa', value: 'homestay-villa' },
+  { label: 'Cost Guide', value: 'cost-guide' },
 ]
 
 const STAGE_FILTERS: { label: string; value: 'all' | GalleryStage }[] = [
@@ -53,11 +53,11 @@ const STAGE_FILTERS: { label: string; value: 'all' | GalleryStage }[] = [
 
 const CATEGORY_LABELS: Record<GalleryCategory, string> = {
   architecture: 'Architecture',
-  homes: 'Homes',
-  homestays: 'Homestays',
+  construction: 'Construction',
+  'cost-guide': 'Cost Guide',
+  'homestay-villa': 'Homestay & Villa',
   interiors: 'Interiors',
-  renovation: 'Renovation',
-  villas: 'Villas',
+  projects: 'Projects',
 }
 
 const STAGE_LABELS: Record<GalleryStage, string> = {
@@ -74,19 +74,43 @@ export const CorespaceProjectGallery: React.FC<CorespaceProjectGalleryProps> = (
   const [category, setCategory] = useState<'all' | GalleryCategory>('all')
   const [stage, setStage] = useState<'all' | GalleryStage>('all')
 
-  const filteredItems = useMemo(() => {
+  const normalizedItems = useMemo(() => {
     if (!items?.length) {
       return []
     }
 
-    return items.filter((item) => {
+    const legacyCategoryMap: Record<string, GalleryCategory> = {
+      architecture: 'architecture',
+      construction: 'construction',
+      'cost-guide': 'cost-guide',
+      homes: 'construction',
+      'homestay-villa': 'homestay-villa',
+      homestays: 'homestay-villa',
+      interiors: 'interiors',
+      projects: 'projects',
+      renovation: 'projects',
+      villas: 'homestay-villa',
+    }
+
+    return items.map((item) => ({
+      ...item,
+      category: legacyCategoryMap[item.category] || 'projects',
+    }))
+  }, [items])
+
+  const filteredItems = useMemo(() => {
+    if (!normalizedItems.length) {
+      return []
+    }
+
+    return normalizedItems.filter((item) => {
       const categoryMatch = category === 'all' || item.category === category
       const stageMatch = stage === 'all' || item.stage === stage
       return categoryMatch && stageMatch
     })
-  }, [category, items, stage])
+  }, [category, normalizedItems, stage])
 
-  if (!items?.length) {
+  if (!normalizedItems.length) {
     return null
   }
 

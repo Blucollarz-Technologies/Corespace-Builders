@@ -3120,7 +3120,13 @@ export interface CorespaceProjectGallerySection {
   items?:
     | {
         image?: (string | null) | Media;
-        category: 'homes' | 'villas' | 'homestays' | 'renovation' | 'architecture' | 'interiors';
+        category:
+          | 'construction'
+          | 'architecture'
+          | 'interiors'
+          | 'projects'
+          | 'homestay-villa'
+          | 'cost-guide';
         stage: 'before' | 'during' | 'completed';
         location: string;
         description: string;
