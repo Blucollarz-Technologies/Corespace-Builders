@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 
+import { GoogleAdsHead } from '@components/Analytics/GoogleAds/index'
 import { GoogleAnalytics } from '@components/Analytics/GoogleAnalytics/index'
 import {
   GoogleTagManagerHead,
@@ -20,8 +21,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        {/* Google Tag Manager — as high as possible in <head> */}
+        {/* Google Tag Manager — first in <head>, native script (Tag Assistant readable) */}
         <GoogleTagManagerHead />
+        {/* Google Ads tag (AW-…) — required for Ads “Test installation” detection */}
+        <GoogleAdsHead />
         <link href={process.env.NEXT_PUBLIC_SITE_URL} rel="dns-prefetch" />
         <link href="https://www.googletagmanager.com" rel="preconnect" />
         <link href="https://www.google-analytics.com" rel="preconnect" />
@@ -30,7 +33,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         className={[GeistMono.variable, inter.variable].join(' ')}
         suppressHydrationWarning
       >
-        {/* Google Tag Manager (noscript) — immediately after <body> */}
+        {/* Google Tag Manager (noscript) — first child of <body> */}
         <GoogleTagManagerNoScript />
         <PrivacyProvider>
           <GoogleAnalytics />
