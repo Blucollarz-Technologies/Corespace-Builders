@@ -1,6 +1,7 @@
 import { Archive } from '@components/Archive'
 import { fetchArchive, fetchArchives } from '@data'
 import { getBlogListingPath } from '@root/utilities/postUrls'
+import { sanitizePathSegment } from '@root/utilities/safePathSegment'
 import { unstable_cache } from 'next/cache'
 import { draftMode } from 'next/headers'
 import { notFound, redirect } from 'next/navigation'
@@ -36,9 +37,12 @@ export default async ({
 
 export const generateStaticParams = async () => {
   const archives = await fetchArchives()
-  return archives.map((archive) => ({
-    category: archive.slug,
-  }))
+  return archives
+    .map((archive) => {
+      const category = sanitizePathSegment(archive.slug)
+      return category ? { category } : null
+    })
+    .filter(Boolean)
 }
 
 export const generateMetadata = async ({ params }: { params: Promise<{ category: string }> }) => {

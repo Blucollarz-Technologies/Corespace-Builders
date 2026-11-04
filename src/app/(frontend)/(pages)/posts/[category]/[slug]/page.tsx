@@ -5,6 +5,7 @@ import { Post } from '@components/Post/index'
 import { RefreshRouteOnSave } from '@components/RefreshRouterOnSave/index'
 import { fetchBlogPost, fetchPosts } from '@data'
 import { mergeOpenGraph } from '@root/seo/mergeOpenGraph'
+import { sanitizePathSegment } from '@root/utilities/safePathSegment'
 import { unstable_cache } from 'next/cache'
 import { draftMode } from 'next/headers'
 import React from 'react'
@@ -57,13 +58,19 @@ export async function generateStaticParams() {
 
   return posts
     .map(({ slug, category }) => {
-      if (!category || typeof category === 'string' || !category.slug) {
+      if (!category || typeof category === 'string') {
+        return null
+      }
+
+      const safeSlug = sanitizePathSegment(slug)
+      const safeCategory = sanitizePathSegment(category.slug)
+      if (!safeSlug || !safeCategory) {
         return null
       }
 
       return {
-        slug,
-        category: category.slug,
+        slug: safeSlug,
+        category: safeCategory,
       }
     })
     .filter(Boolean)
