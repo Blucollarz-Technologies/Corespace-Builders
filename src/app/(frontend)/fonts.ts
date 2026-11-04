@@ -1,10 +1,7 @@
-import { Inter } from 'next/font/google'
+import { GeistSans } from 'geist/font/sans'
 
-export const inter = Inter({
-  adjustFontFallback: true,
-  display: 'swap',
-  fallback: ['system-ui', 'Segoe UI', 'Arial', 'sans-serif'],
-  subsets: ['latin'],
-  variable: '--font-body',
-  weight: ['400', '500', '600', '700'],
-})
+/**
+ * Body font via local Geist Sans (bundled with `geist` package).
+ * Avoids `next/font/google` Inter fetch failures on Vercel builds.
+ */
+export const inter = GeistSans
