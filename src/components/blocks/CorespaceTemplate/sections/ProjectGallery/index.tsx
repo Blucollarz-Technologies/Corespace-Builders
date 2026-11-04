@@ -73,6 +73,7 @@ export const CorespaceProjectGallery: React.FC<CorespaceProjectGalleryProps> = (
 }) => {
   const [category, setCategory] = useState<'all' | GalleryCategory>('all')
   const [stage, setStage] = useState<'all' | GalleryStage>('all')
+  const isArticlesGallery = /article/i.test(heading || '') || /latest|article/i.test(eyebrow || '')
 
   const normalizedItems = useMemo(() => {
     if (!items?.length) {
@@ -148,24 +149,26 @@ export const CorespaceProjectGallery: React.FC<CorespaceProjectGalleryProps> = (
           ))}
         </div>
 
-        <div className={classes.filterRow} role="group" aria-label="Filter by stage">
-          {STAGE_FILTERS.map((filter) => (
-            <button
-              className={[
-                classes.filterButton,
-                classes.stageButton,
-                stage === filter.value ? classes.stageActive : '',
-              ]
-                .filter(Boolean)
-                .join(' ')}
-              key={filter.value}
-              onClick={() => setStage(filter.value)}
-              type="button"
-            >
-              {filter.label}
-            </button>
-          ))}
-        </div>
+        {!isArticlesGallery && (
+          <div className={classes.filterRow} role="group" aria-label="Filter by stage">
+            {STAGE_FILTERS.map((filter) => (
+              <button
+                className={[
+                  classes.filterButton,
+                  classes.stageButton,
+                  stage === filter.value ? classes.stageActive : '',
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
+                key={filter.value}
+                onClick={() => setStage(filter.value)}
+                type="button"
+              >
+                {filter.label}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {filteredItems.length === 0 ? (
