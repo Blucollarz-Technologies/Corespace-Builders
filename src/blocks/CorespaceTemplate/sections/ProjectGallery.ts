@@ -114,6 +114,15 @@ export const CorespaceProjectGallerySection: Block = {
           type: 'textarea',
           required: true,
         },
+        {
+          name: 'href',
+          type: 'text',
+          admin: {
+            description:
+              'Optional. Makes the card open this path on click (e.g. /blog/my-article or /service/architecture-design-karnataka).',
+          },
+          label: 'Link URL',
+        },
       ],
     },
   ],

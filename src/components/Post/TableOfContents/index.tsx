@@ -11,7 +11,7 @@ type Props = {
   title?: string | null
 }
 
-export const TableOfContents: React.FC<Props> = ({ items, title }) => {
+export const TableOfContents: React.FC<Props> = ({ items }) => {
   const [open, setOpen] = useState(true)
   const panelId = useId()
 
@@ -19,10 +19,26 @@ export const TableOfContents: React.FC<Props> = ({ items, title }) => {
     return null
   }
 
+  const stepCount = items.reduce((total, item) => total + (item.children?.length || 0), 0)
+
   return (
     <nav aria-label="Table of contents" className={classes.toc}>
       <div className={classes.header}>
-        <p className={classes.heading}>Table of Contents</p>
+        <div className={classes.headerCopy}>
+          <p className={classes.eyebrow}>
+            <span className={classes.eyebrowDash} aria-hidden>
+              —
+            </span>
+            On this page
+          </p>
+          <div className={classes.titleRow}>
+            <h2 className={classes.heading}>Table of Contents</h2>
+            {stepCount > 0 ? (
+              <span className={classes.count}>{stepCount} sections</span>
+            ) : null}
+          </div>
+        </div>
+
         <button
           aria-controls={panelId}
           aria-expanded={open}
@@ -30,32 +46,48 @@ export const TableOfContents: React.FC<Props> = ({ items, title }) => {
           onClick={() => setOpen((value) => !value)}
           type="button"
         >
-          <span aria-hidden className={classes.toggleIcon}>
-            {open ? '—' : '+'}
-          </span>
-          <span className="visually-hidden">{open ? 'Collapse' : 'Expand'} table of contents</span>
+          {open ? 'Hide' : 'Show'}
         </button>
       </div>
 
-      {open && (
+      {open ? (
         <div className={classes.panel} id={panelId}>
-          {title ? (
-            <a className={classes.articleLink} href="#blog">
-              {title}
-            </a>
-          ) : null}
+          <ul className={classes.sections}>
+            {items.map((item) => {
+              const hasSteps = Boolean(item.children?.length)
 
-          <ol className={classes.list}>
-            {items.map((item) => (
-              <li className={classes.item} key={item.id}>
-                <a className={classes.link} href={`#${item.id}`}>
-                  {item.text}
-                </a>
-              </li>
-            ))}
-          </ol>
+              return (
+                <li
+                  className={[classes.section, hasSteps ? classes.sectionWithSteps : '']
+                    .filter(Boolean)
+                    .join(' ')}
+                  key={item.id}
+                >
+                  <a className={classes.sectionLink} href={`#${item.id}`}>
+                    <span className={classes.sectionAccent} aria-hidden />
+                    <span className={classes.sectionText}>{item.text}</span>
+                  </a>
+
+                  {hasSteps ? (
+                    <ol className={classes.list}>
+                      {item.children!.map((child, index) => (
+                        <li className={classes.item} key={child.id}>
+                          <a className={classes.link} href={`#${child.id}`}>
+                            <span className={classes.number} aria-hidden>
+                              {String(index + 1).padStart(2, '0')}
+                            </span>
+                            <span className={classes.linkText}>{child.text}</span>
+                          </a>
+                        </li>
+                      ))}
+                    </ol>
+                  ) : null}
+                </li>
+              )
+            })}
+          </ul>
         </div>
-      )}
+      ) : null}
     </nav>
   )
 }
