@@ -13,15 +13,15 @@ import { draftMode } from 'next/headers'
 import { notFound } from 'next/navigation'
 import React from 'react'
 
-const SLUG = 'blog'
+const SLUG = ['blog'] as string[]
 
 const getPage = async (draft?: boolean) => {
-  if (draft) {
+  if (draft || process.env.NODE_ENV === 'development') {
     return fetchPage(SLUG)
   }
 
-  return unstable_cache(fetchPage, [`page-${SLUG}`], {
-    tags: [`page_${SLUG}`, 'pages'],
+  return unstable_cache(fetchPage, ['page-blog'], {
+    tags: ['page_blog', 'pages'],
   })(SLUG)
 }
 
