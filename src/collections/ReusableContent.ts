@@ -1,7 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { Banner } from '@root/blocks/Banner'
-import { revalidateTag } from 'next/cache'
+import { revalidatePath, revalidateTag } from 'next/cache'
 
 import { isAdmin } from '../access/isAdmin'
 
@@ -64,7 +64,12 @@ export const ReusableContent: CollectionConfig = {
   hooks: {
     afterChange: [
       () => {
+        // Reusable blocks can appear on pages and posts — refresh both after publish/save
         revalidateTag('posts')
+        revalidateTag('pages')
+        revalidateTag('service_pages')
+        revalidateTag('project_pages')
+        revalidatePath('/')
       },
     ],
   },

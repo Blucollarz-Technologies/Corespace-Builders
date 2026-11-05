@@ -31,6 +31,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body
         className={[GeistMono.variable, inter.variable].join(' ')}
+        style={{ ['--font-body' as string]: 'var(--font-geist-sans)' }}
         suppressHydrationWarning
       >
         {/* Google Tag Manager (noscript) — first child of <body> */}

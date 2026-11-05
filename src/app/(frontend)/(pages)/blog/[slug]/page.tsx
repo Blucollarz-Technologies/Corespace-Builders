@@ -6,6 +6,7 @@ import { RefreshRouteOnSave } from '@components/RefreshRouterOnSave/index'
 import { fetchBlogPost, fetchPosts } from '@data'
 import { mergeOpenGraph } from '@root/seo/mergeOpenGraph'
 import { getBlogPostPath } from '@root/utilities/postUrls'
+import { sanitizePathSegment } from '@root/utilities/safePathSegment'
 import { unstable_cache } from 'next/cache'
 import { draftMode } from 'next/headers'
 import React from 'react'
@@ -54,11 +55,8 @@ export async function generateStaticParams() {
 
   return posts
     .map(({ slug }) => {
-      if (!slug) {
-        return null
-      }
-
-      return { slug }
+      const safeSlug = sanitizePathSegment(slug)
+      return safeSlug ? { slug: safeSlug } : null
     })
     .filter(Boolean)
 }

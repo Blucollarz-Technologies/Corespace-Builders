@@ -1,12 +1,12 @@
 import type { Block } from 'payload'
 
 const categoryOptions = [
-  { label: 'Homes', value: 'homes' },
-  { label: 'Villas', value: 'villas' },
-  { label: 'Homestays', value: 'homestays' },
-  { label: 'Renovation', value: 'renovation' },
+  { label: 'Construction', value: 'construction' },
   { label: 'Architecture', value: 'architecture' },
   { label: 'Interiors', value: 'interiors' },
+  { label: 'Projects', value: 'projects' },
+  { label: 'Homestay & Villa', value: 'homestay-villa' },
+  { label: 'Cost Guide', value: 'cost-guide' },
 ]
 
 const stageOptions = [
@@ -49,28 +49,10 @@ export const CorespaceProjectGallerySection: Block = {
       minRows: 1,
       defaultValue: [
         {
-          category: 'homes',
+          category: 'construction',
           stage: 'completed',
           location: 'Madikeri, Kodagu',
           description: 'Completed family residence with efficient layout.',
-        },
-        {
-          category: 'villas',
-          stage: 'completed',
-          location: 'Coorg, Kodagu',
-          description: 'Premium villa with landscape integration.',
-        },
-        {
-          category: 'homestays',
-          stage: 'during',
-          location: 'Coorg, Kodagu',
-          description: 'Guest room interiors under development.',
-        },
-        {
-          category: 'renovation',
-          stage: 'before',
-          location: 'Madikeri, Kodagu',
-          description: 'Property condition prior to upgrade.',
         },
         {
           category: 'architecture',
@@ -83,6 +65,24 @@ export const CorespaceProjectGallerySection: Block = {
           stage: 'completed',
           location: 'Coorg, Kodagu',
           description: 'Warm, natural materials throughout the living space.',
+        },
+        {
+          category: 'projects',
+          stage: 'completed',
+          location: 'Coorg, Kodagu',
+          description: 'Premium villa with landscape integration.',
+        },
+        {
+          category: 'homestay-villa',
+          stage: 'during',
+          location: 'Coorg, Kodagu',
+          description: 'Guest room interiors under development.',
+        },
+        {
+          category: 'cost-guide',
+          stage: 'before',
+          location: 'Madikeri, Kodagu',
+          description: 'Budget ranges clarified before construction begins.',
         },
       ],
       fields: [
