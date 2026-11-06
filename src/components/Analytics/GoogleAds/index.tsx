@@ -5,25 +5,16 @@ export const GOOGLE_ADS_ID =
   process.env.NEXT_PUBLIC_GOOGLE_ADS_ID?.trim() || 'AW-18530648004'
 
 /**
- * Official Google tag (gtag.js) for Google Ads.
- * Must appear in <head> as native scripts so Ads / Tag Assistant can detect it.
+ * Direct Google Ads gtag.js install — DISABLED on purpose.
+ *
+ * This site uses Google Tag Manager (`GTM-M54MD6F2`) as the only page-level
+ * Google tag. Loading AW-… via gtag.js alongside GTM makes Tag Assistant report
+ * "A tag on this page is installed incorrectly" (Google: use GTM or gtag, not both).
+ *
+ * Add `AW-18530648004` as a Google Ads tag inside the GTM container, then publish.
+ * This component always returns null so a mistaken import cannot break Tag Assistant again.
  */
 export const GoogleAdsHead: React.FC = () => {
-  if (!GOOGLE_ADS_ID) {
-    return null
-  }
-
-  return (
-    <>
-      <script async src={`https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ADS_ID}`} />
-      <script
-        dangerouslySetInnerHTML={{
-          __html: `window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', '${GOOGLE_ADS_ID}');`,
-        }}
-      />
-    </>
-  )
+  void GOOGLE_ADS_ID
+  return null
 }

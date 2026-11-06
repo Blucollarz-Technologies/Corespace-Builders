@@ -1,4 +1,5 @@
 import config from '@payload-config'
+import { hydrateCorespaceMedia } from '@root/utilities/hydrateCorespaceMedia'
 import { draftMode } from 'next/headers'
 import { getPayload } from 'payload'
 
@@ -89,7 +90,7 @@ export const fetchPage = async (incomingSlugSegments: string[]): Promise<null | 
   })
 
   if (page) {
-    return page
+    return hydrateCorespaceMedia(page, payload)
   }
 
   return null

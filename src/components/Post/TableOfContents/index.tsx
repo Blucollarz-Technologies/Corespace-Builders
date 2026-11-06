@@ -11,11 +11,18 @@ type Props = {
   title?: string | null
 }
 
+const flattenTocItems = (items: PostTocItem[]) =>
+  items.flatMap((item) => [
+    { id: item.id, text: item.text },
+    ...(item.children || []).map((child) => ({ id: child.id, text: child.text })),
+  ])
+
 export const TableOfContents: React.FC<Props> = ({ items, title }) => {
   const [open, setOpen] = useState(true)
   const panelId = useId()
+  const flatItems = flattenTocItems(items)
 
-  if (!items.length) {
+  if (!flatItems.length) {
     return null
   }
 
@@ -37,7 +44,7 @@ export const TableOfContents: React.FC<Props> = ({ items, title }) => {
         </button>
       </div>
 
-      {open && (
+      {open ? (
         <div className={classes.panel} id={panelId}>
           {title ? (
             <a className={classes.articleLink} href="#blog">
@@ -46,7 +53,7 @@ export const TableOfContents: React.FC<Props> = ({ items, title }) => {
           ) : null}
 
           <ol className={classes.list}>
-            {items.map((item) => (
+            {flatItems.map((item) => (
               <li className={classes.item} key={item.id}>
                 <a className={classes.link} href={`#${item.id}`}>
                   {item.text}
@@ -55,7 +62,7 @@ export const TableOfContents: React.FC<Props> = ({ items, title }) => {
             ))}
           </ol>
         </div>
-      )}
+      ) : null}
     </nav>
   )
 }
