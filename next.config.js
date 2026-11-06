@@ -42,12 +42,24 @@ const localhost = process.env.NEXT_PUBLIC_IS_LIVE
     ]
 
 const nextDistDir = getNextDistDir()
+const oneDriveProject = isOneDriveProject()
 
 const nextConfig = withBundleAnalyzer({
   distDir: nextDistDir,
   eslint: {
     ignoreDuringBuilds: true,
   },
+  // OneDrive sync can delete/partial-write webpack chunks while Next workers
+  // collect page data (MODULE_NOT_FOUND ./NNN.js). Keep generation serial locally.
+  ...(oneDriveProject
+    ? {
+        experimental: {
+          cpus: 1,
+          workerThreads: false,
+        },
+        staticPageGenerationTimeout: 180,
+      }
+    : {}),
   reactStrictMode: true,
   images: {
     minimumCacheTTL: 60 * 60 * 24 * 365, // 1 year,
@@ -109,11 +121,12 @@ const nextConfig = withBundleAnalyzer({
       '@graphql': path.resolve(dirname, './src/graphql'),
     },
   },
-  webpack: (config, { dev }) => {
+  webpack: (config) => {
     const configCopy = { ...config }
 
-    // OneDrive breaks webpack's filesystem cache during dev; use in-memory cache instead.
-    if (dev && isOneDriveProject()) {
+    // OneDrive corrupts webpack's filesystem pack cache (missing ./NNN.js chunks).
+    // Use memory cache for both dev and production builds on OneDrive paths.
+    if (oneDriveProject) {
       configCopy.cache = { type: 'memory' }
     }
 
