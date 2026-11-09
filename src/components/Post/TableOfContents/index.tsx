@@ -37,7 +37,7 @@ export const TableOfContents: React.FC<Props> = ({ items, title }) => {
         </button>
       </div>
 
-      {open && (
+      {open ? (
         <div className={classes.panel} id={panelId}>
           {title ? (
             <a className={classes.articleLink} href="#blog">
@@ -55,7 +55,7 @@ export const TableOfContents: React.FC<Props> = ({ items, title }) => {
             ))}
           </ol>
         </div>
-      )}
+      ) : null}
     </nav>
   )
 }

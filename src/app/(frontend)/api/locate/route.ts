@@ -84,6 +84,9 @@ const gdprCountryCodes = [
 const locate = (countryCode: null | string = null): boolean =>
   countryCode ? gdprCountryCodes.indexOf(countryCode) > -1 : true
 
+/** Geo header is request-time; never try to statically collect this route. */
+export const dynamic = 'force-dynamic'
+
 export function GET(req: Request) {
   const country = req.headers.get('x-vercel-ip-country')
   const isGDPR = locate(country)

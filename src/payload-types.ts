@@ -3120,16 +3120,14 @@ export interface CorespaceProjectGallerySection {
   items?:
     | {
         image?: (string | null) | Media;
-        category:
-          | 'construction'
-          | 'architecture'
-          | 'interiors'
-          | 'projects'
-          | 'homestay-villa'
-          | 'cost-guide';
+        category: 'construction' | 'architecture' | 'interiors' | 'projects' | 'homestay-villa' | 'cost-guide';
         stage: 'before' | 'during' | 'completed';
         location: string;
         description: string;
+        /**
+         * Optional. Makes the card open this path on click (e.g. /blog/my-article or /service/architecture-design-karnataka).
+         */
+        href?: string | null;
         id?: string | null;
       }[]
     | null;

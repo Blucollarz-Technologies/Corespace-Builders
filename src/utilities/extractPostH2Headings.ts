@@ -1,6 +1,6 @@
 import type { Post } from '@root/payload-types'
 
-import { resolveHeadingAnchor } from '@root/utilities/headingAnchor'
+import { resolveHeadingAnchor, stripLeadingHeadingNumber } from '@root/utilities/headingAnchor'
 
 export type PostTocItem = {
   id: string
@@ -37,6 +37,19 @@ const getLexicalText = (node: unknown): string => {
   return ''
 }
 
+const pushHeading = (rawText: string, out: PostTocItem[]) => {
+  const { id, text } = resolveHeadingAnchor(rawText)
+  if (!text) {
+    return
+  }
+
+  out.push({
+    id,
+    // Keep browser list numbers only — strip "1." from heading text.
+    text: stripLeadingHeadingNumber(text),
+  })
+}
+
 const walkLexicalForH2 = (node: unknown, out: PostTocItem[]) => {
   if (!node || typeof node !== 'object') {
     return
@@ -50,10 +63,7 @@ const walkLexicalForH2 = (node: unknown, out: PostTocItem[]) => {
   const value = node as Record<string, unknown>
 
   if (value.type === 'heading' && value.tag === 'h2') {
-    const { id, text } = resolveHeadingAnchor(getLexicalText(value))
-    if (text) {
-      out.push({ id, text })
-    }
+    pushHeading(getLexicalText(value), out)
     return
   }
 
@@ -69,16 +79,13 @@ const walkLexicalForH2 = (node: unknown, out: PostTocItem[]) => {
 const extractMarkdownH2 = (markdown: string, out: PostTocItem[]) => {
   const matches = markdown.matchAll(/^##\s+(.+)$/gm)
   for (const match of matches) {
-    const { id, text } = resolveHeadingAnchor(match[1] || '')
-    if (text) {
-      out.push({ id, text })
-    }
+    pushHeading(match[1] || '', out)
   }
 }
 
 /**
  * Collect H2 headings from post content blocks for an auto Table of Contents.
- * Supports Lexical `blogContent` and Markdown `blogMarkdown` blocks.
+ * Flat list (original style) — supports Lexical `blogContent` and Markdown `blogMarkdown`.
  */
 export const extractPostH2Headings = (
   content: Post['content'] | null | undefined,
@@ -111,3 +118,5 @@ export const extractPostH2Headings = (
 
 /** Longer articles only — short posts stay clean without a TOC. */
 export const MIN_TOC_HEADINGS = 3
+
+export const countPostTocItems = (items: PostTocItem[]): number => items.length

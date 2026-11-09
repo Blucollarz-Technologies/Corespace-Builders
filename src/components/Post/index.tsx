@@ -9,6 +9,7 @@ import { RichText } from '@components/RichText/index'
 import { Video } from '@components/RichText/Video/index'
 import { getVideo } from '@root/utilities/get-video'
 import {
+  countPostTocItems,
   extractPostH2Headings,
   MIN_TOC_HEADINGS,
 } from '@root/utilities/extractPostH2Headings'
@@ -137,7 +138,7 @@ export const Post: React.FC<Partial<PostType>> = (props) => {
       : videoUrl && <Video {...getVideo(videoUrl)} />
 
   const tocItems = extractPostH2Headings(content)
-  const showToc = tocItems.length >= MIN_TOC_HEADINGS
+  const showToc = countPostTocItems(tocItems) >= MIN_TOC_HEADINGS
 
   return (
     <BlockWrapper

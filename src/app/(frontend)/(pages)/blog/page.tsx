@@ -20,7 +20,7 @@ const getPage = async (draft?: boolean) => {
     return fetchPage(SLUG)
   }
 
-  return unstable_cache(fetchPage, ['page-blog'], {
+  return unstable_cache(fetchPage, ['page-blog-v3'], {
     tags: ['page_blog', 'pages'],
   })(SLUG)
 }

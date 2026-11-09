@@ -3,6 +3,8 @@
 import type { Media as MediaType } from '@root/payload-types'
 
 import { Media } from '@components/Media/index'
+import { resolveCorespaceUrl } from '@root/utilities/resolveCorespaceUrl'
+import Link from 'next/link'
 import React, { useMemo, useState } from 'react'
 
 import classes from './index.module.scss'
@@ -20,6 +22,7 @@ type GalleryStage = 'before' | 'completed' | 'during'
 export type GalleryItem = {
   category: GalleryCategory
   description: string
+  href?: null | string
   id?: null | string
   image?: MediaType | null | string
   location: string
@@ -176,23 +179,46 @@ export const CorespaceProjectGallery: React.FC<CorespaceProjectGalleryProps> = (
       ) : (
         <ul className={classes.grid}>
           {filteredItems.map((item, index) => {
-            const hasImage = Boolean(item.image && typeof item.image !== 'string')
+            const media =
+              item.image && typeof item.image === 'object' && 'url' in item.image
+                ? (item.image as MediaType)
+                : null
+            const href = item.href?.trim()
+              ? resolveCorespaceUrl(item.href.trim()) || item.href.trim()
+              : null
 
-            return (
-              <li className={classes.card} key={item.id ?? `${item.location}-${index}`}>
+            const content = (
+              <>
                 <div className={classes.media}>
-                  {hasImage ? (
-                    <Media className={classes.image} resource={item.image as MediaType} />
+                  {media?.url ? (
+                    <Media className={classes.image} fill resource={media} />
                   ) : (
                     <div className={classes.imagePlaceholder} aria-hidden />
                   )}
-                  <span className={classes.badge}>{STAGE_LABELS[item.stage]}</span>
+                  {!isArticlesGallery && (
+                    <span className={classes.badge}>{STAGE_LABELS[item.stage]}</span>
+                  )}
                 </div>
                 <div className={classes.body}>
                   <p className={classes.category}>{CATEGORY_LABELS[item.category]}</p>
                   <h3 className={classes.location}>{item.location}</h3>
                   <p className={classes.description}>{item.description}</p>
                 </div>
+              </>
+            )
+
+            return (
+              <li
+                className={[classes.card, href ? classes.cardLink : ''].filter(Boolean).join(' ')}
+                key={item.id ?? `${item.location}-${index}`}
+              >
+                {href ? (
+                  <Link className={classes.cardAnchor} href={href} prefetch={false}>
+                    {content}
+                  </Link>
+                ) : (
+                  content
+                )}
               </li>
             )
           })}
