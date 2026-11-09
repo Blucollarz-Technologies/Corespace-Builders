@@ -16,7 +16,7 @@ const getPost = async (slug: string, draft?: boolean) => {
     return fetchBlogPost(slug)
   }
 
-  return unstable_cache(() => fetchBlogPost(slug), ['blogPost', slug, 'toc-v2'], {
+  return unstable_cache(() => fetchBlogPost(slug), ['blogPost', slug, 'toc-v3'], {
     tags: [`post_${slug}`, 'posts'],
   })()
 }
