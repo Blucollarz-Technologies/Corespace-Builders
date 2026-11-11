@@ -7,6 +7,7 @@ import { RefreshRouteOnSave } from '@components/RefreshRouterOnSave'
 import { RenderBlocks } from '@components/RenderBlocks/index'
 import { fetchPage } from '@data'
 import { mergeOpenGraph } from '@root/seo/mergeOpenGraph'
+import { injectLatestArticlesIntoLayout } from '@root/utilities/latestArticleCards'
 import { getBlogListingPath } from '@root/utilities/postUrls'
 import { unstable_cache } from 'next/cache'
 import { draftMode } from 'next/headers'
@@ -20,9 +21,19 @@ const getPage = async (draft?: boolean) => {
     return fetchPage(SLUG)
   }
 
-  return unstable_cache(fetchPage, ['page-blog-v3'], {
-    tags: ['page_blog', 'pages'],
+  return unstable_cache(fetchPage, ['page-blog-v4'], {
+    tags: ['page_blog', 'pages', 'posts'],
   })(SLUG)
+}
+
+const getLatestArticlesLayout = async (layout: NonNullable<Awaited<ReturnType<typeof getPage>>>['layout'], draft?: boolean) => {
+  if (draft || process.env.NODE_ENV === 'development') {
+    return injectLatestArticlesIntoLayout(layout)
+  }
+
+  return unstable_cache(injectLatestArticlesIntoLayout, ['blog-latest-articles-v1'], {
+    tags: ['page_blog', 'pages', 'posts'],
+  })(layout)
 }
 
 export default async () => {
@@ -33,12 +44,14 @@ export default async () => {
     notFound()
   }
 
+  const layout = (await getLatestArticlesLayout(page.layout, draft)) || page.layout
+
   return (
     <React.Fragment>
       <PayloadRedirects disableNotFound url={getBlogListingPath()} />
       <RefreshRouteOnSave />
-      <Hero firstContentBlock={page.layout?.[0]} page={page} />
-      <RenderBlocks blocks={page.layout} hero={page.hero} />
+      <Hero firstContentBlock={layout?.[0]} page={page} />
+      <RenderBlocks blocks={layout} hero={page.hero} />
     </React.Fragment>
   )
 }

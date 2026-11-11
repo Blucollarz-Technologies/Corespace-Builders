@@ -119,9 +119,30 @@ export const CorespaceProjectGallerySection: Block = {
           type: 'text',
           admin: {
             description:
-              'Optional. Makes the card open this path on click (e.g. /blog/my-article or /service/architecture-design-karnataka).',
+              'Optional. Makes the card open this path on click (e.g. /blog/my-article). Latest Articles on /blog auto-fills from published posts.',
           },
           label: 'Link URL',
+        },
+        {
+          name: 'publishedOn',
+          type: 'date',
+          admin: {
+            description: 'Optional. Shown on Latest Articles cards (e.g. Jun 2026).',
+            date: {
+              pickerAppearance: 'dayOnly',
+            },
+          },
+          label: 'Published date',
+        },
+        {
+          name: 'readingTime',
+          type: 'number',
+          admin: {
+            description: 'Optional. Minutes shown on Latest Articles cards (e.g. 6).',
+            step: 1,
+          },
+          label: 'Reading time (minutes)',
+          min: 1,
         },
       ],
     },
