@@ -31,7 +31,7 @@ const getLatestArticlesLayout = async (layout: NonNullable<Awaited<ReturnType<ty
     return injectLatestArticlesIntoLayout(layout)
   }
 
-  return unstable_cache(injectLatestArticlesIntoLayout, ['blog-latest-articles-v1'], {
+  return unstable_cache(injectLatestArticlesIntoLayout, ['blog-latest-articles-v2'], {
     tags: ['page_blog', 'pages', 'posts'],
   })(layout)
 }

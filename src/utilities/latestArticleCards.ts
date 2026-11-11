@@ -26,28 +26,46 @@ export type LatestArticleGalleryItem = {
   stage: 'completed'
 }
 
-const mapCategory = (category: Category | null | string | undefined): ArticleGalleryCategory => {
-  const slug = typeof category === 'object' && category ? category.slug || '' : ''
-  const name = typeof category === 'object' && category ? category.name || '' : ''
-  const haystack = `${slug} ${name}`.toLowerCase()
+const mapCategory = (
+  category: Category | null | string | undefined,
+  title = '',
+  postSlug = '',
+): ArticleGalleryCategory => {
+  const categorySlug = typeof category === 'object' && category ? category.slug || '' : ''
+  const categoryName = typeof category === 'object' && category ? category.name || '' : ''
+  // Most Corespace posts live under the generic "blog" category, so also use title/slug.
+  const haystack = `${categorySlug} ${categoryName} ${title} ${postSlug}`.toLowerCase()
 
-  if (/architect|design/.test(haystack)) {
-    return 'architecture'
+  // Most-specific matches first.
+  if (/cost/.test(haystack)) {
+    return 'cost-guide'
   }
   if (/interior/.test(haystack)) {
     return 'interiors'
   }
-  if (/renov|project/.test(haystack)) {
-    return 'projects'
+  if (/architect|home-design|designing a home|sloped land|layout/.test(haystack)) {
+    return 'architecture'
   }
   if (/homestay|villa/.test(haystack)) {
     return 'homestay-villa'
   }
-  if (/cost/.test(haystack)) {
-    return 'cost-guide'
+  if (/renov|buying.?land|plot|land-buying|land in coorg/.test(haystack)) {
+    return 'projects'
   }
-  if (/construct|commercial|build/.test(haystack)) {
+  if (/construct|commercial|build|quality checklist/.test(haystack)) {
     return 'construction'
+  }
+
+  if (categorySlug && categorySlug !== 'blog') {
+    if (categorySlug.includes('architect')) {
+      return 'architecture'
+    }
+    if (categorySlug.includes('interior')) {
+      return 'interiors'
+    }
+    if (categorySlug.includes('cost')) {
+      return 'cost-guide'
+    }
   }
 
   return 'construction'
@@ -102,7 +120,11 @@ export const fetchLatestArticleGalleryItems = async (
             : null
 
       return {
-        category: mapCategory(post.category as Category | null | string | undefined),
+        category: mapCategory(
+          post.category as Category | null | string | undefined,
+          post.title || '',
+          slug,
+        ),
         description: getPostCardDescription(post) || 'Read the full planning guide.',
         href: getBlogPostPath(slug),
         id: String(post.id),
