@@ -1,141 +1,21 @@
-import type { Category, Media, Page, Post } from '@root/payload-types'
+import type { Media, Page, Post } from '@root/payload-types'
 
 import { getPayload } from 'payload'
 import config from '@payload-config'
 import { getPostCardDescription } from '@root/utilities/getPostCardDescription'
-import { getBlogPostPath } from '@root/utilities/postUrls'
 import { lexicalToPlaintext } from '@root/utilities/lexicalToPlaintext'
 
-export type ArticleGalleryCategory =
-  | 'architecture'
-  | 'construction'
-  | 'cost-guide'
-  | 'homestay-villa'
-  | 'interiors'
-  | 'projects'
-
-export type LatestArticleGalleryItem = {
-  category: ArticleGalleryCategory
-  description: string
-  href: string
-  id: string
+type GalleryItem = {
+  category?: string
+  description?: string
+  href?: null | string
+  id?: null | string
   image?: Media | null | string
-  location: string
+  location?: string
   publishedOn?: null | string
   readingTime?: null | number
-  stage: 'completed'
-}
-
-const mapCategory = (
-  category: Category | null | string | undefined,
-  title = '',
-  postSlug = '',
-): ArticleGalleryCategory => {
-  const categorySlug = typeof category === 'object' && category ? category.slug || '' : ''
-  const categoryName = typeof category === 'object' && category ? category.name || '' : ''
-  // Most Corespace posts live under the generic "blog" category, so also use title/slug.
-  const haystack = `${categorySlug} ${categoryName} ${title} ${postSlug}`.toLowerCase()
-
-  // Most-specific matches first.
-  if (/cost/.test(haystack)) {
-    return 'cost-guide'
-  }
-  if (/interior/.test(haystack)) {
-    return 'interiors'
-  }
-  if (/architect|home-design|designing a home|sloped land|layout/.test(haystack)) {
-    return 'architecture'
-  }
-  if (/homestay|villa/.test(haystack)) {
-    return 'homestay-villa'
-  }
-  if (/renov|buying.?land|plot|land-buying|land in coorg/.test(haystack)) {
-    return 'projects'
-  }
-  if (/construct|commercial|build|quality checklist/.test(haystack)) {
-    return 'construction'
-  }
-
-  if (categorySlug && categorySlug !== 'blog') {
-    if (categorySlug.includes('architect')) {
-      return 'architecture'
-    }
-    if (categorySlug.includes('interior')) {
-      return 'interiors'
-    }
-    if (categorySlug.includes('cost')) {
-      return 'cost-guide'
-    }
-  }
-
-  return 'construction'
-}
-
-const estimateReadingTime = (post: Partial<Post>): number => {
-  const text = [
-    post.title || '',
-    getPostCardDescription(post),
-    lexicalToPlaintext(post.excerpt),
-    typeof post.content === 'object' ? JSON.stringify(post.content) : '',
-  ]
-    .join(' ')
-    .replace(/\s+/g, ' ')
-    .trim()
-
-  const words = text.split(/\s+/).filter(Boolean).length
-  return Math.max(3, Math.min(12, Math.round(words / 200) || 5))
-}
-
-export const fetchLatestArticleGalleryItems = async (
-  limit = 12,
-): Promise<LatestArticleGalleryItem[]> => {
-  const payload = await getPayload({ config })
-  const currentDate = new Date()
-
-  const data = await payload.find({
-    collection: 'posts',
-    depth: 1,
-    limit,
-    sort: '-publishedOn',
-    where: {
-      and: [
-        { publishedOn: { less_than_equal: currentDate } },
-        { _status: { equals: 'published' } },
-      ],
-    },
-  })
-
-  return data.docs
-    .map((post) => {
-      const slug = post.slug?.trim()
-      if (!slug) {
-        return null
-      }
-
-      const image =
-        post.featuredMedia === 'upload' && post.image && typeof post.image === 'object'
-          ? post.image
-          : post.thumbnail && typeof post.thumbnail === 'object'
-            ? post.thumbnail
-            : null
-
-      return {
-        category: mapCategory(
-          post.category as Category | null | string | undefined,
-          post.title || '',
-          slug,
-        ),
-        description: getPostCardDescription(post) || 'Read the full planning guide.',
-        href: getBlogPostPath(slug),
-        id: String(post.id),
-        image,
-        location: post.title || 'Untitled article',
-        publishedOn: post.publishedOn || null,
-        readingTime: estimateReadingTime(post),
-        stage: 'completed' as const,
-      }
-    })
-    .filter(Boolean) as LatestArticleGalleryItem[]
+  stage?: string
+  [key: string]: unknown
 }
 
 const isLatestArticlesSection = (section: unknown): boolean => {
@@ -156,28 +36,93 @@ const isLatestArticlesSection = (section: unknown): boolean => {
   return /article/i.test(value.heading || '') || /latest|article/i.test(value.eyebrow || '')
 }
 
-/** Replace Latest Articles gallery rows with live published posts (clickable /blog/{slug}). */
-export const injectLatestArticlesIntoLayout = async (
+const blogSlugFromHref = (href: string): null | string => {
+  const match = href.trim().match(/^\/blog\/([^/?#]+)\/?$/)
+  return match?.[1] || null
+}
+
+const estimateReadingTime = (post: Partial<Post>): number => {
+  const text = [
+    post.title || '',
+    getPostCardDescription(post),
+    lexicalToPlaintext(post.excerpt),
+    typeof post.content === 'object' ? JSON.stringify(post.content) : '',
+  ]
+    .join(' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+
+  const words = text.split(/\s+/).filter(Boolean).length
+  return Math.max(3, Math.min(12, Math.round(words / 200) || 5))
+}
+
+/**
+ * Keep CMS-curated Latest Articles cards (different service/guide/blog URLs).
+ * Only enrich /blog/{slug} cards with published date + reading time.
+ * Do NOT replace the gallery with the full posts list.
+ */
+export const enrichLatestArticlesInLayout = async (
   layout: Page['layout'] | null | undefined,
 ): Promise<Page['layout'] | null | undefined> => {
   if (!layout?.length) {
     return layout
   }
 
-  const needsInject = layout.some((block) => {
-    if (!block || typeof block !== 'object' || block.blockType !== 'corespaceTemplate') {
-      return false
-    }
-    return Boolean(block.corespaceTemplateFields?.sections?.some(isLatestArticlesSection))
-  })
+  const sectionsNeedingEnrich: GalleryItem[][] = []
 
-  if (!needsInject) {
+  for (const block of layout) {
+    if (!block || typeof block !== 'object' || block.blockType !== 'corespaceTemplate') {
+      continue
+    }
+
+    for (const section of block.corespaceTemplateFields?.sections || []) {
+      if (!isLatestArticlesSection(section)) {
+        continue
+      }
+
+      const items = (section as { items?: GalleryItem[] | null }).items
+      if (items?.length) {
+        sectionsNeedingEnrich.push(items)
+      }
+    }
+  }
+
+  if (!sectionsNeedingEnrich.length) {
     return layout
   }
 
-  const articles = await fetchLatestArticleGalleryItems(12)
-  if (!articles.length) {
-    return layout
+  const slugs = new Set<string>()
+  for (const items of sectionsNeedingEnrich) {
+    for (const item of items) {
+      const slug = item.href ? blogSlugFromHref(item.href) : null
+      if (slug) {
+        slugs.add(slug)
+      }
+    }
+  }
+
+  const postsBySlug = new Map<string, Post>()
+
+  if (slugs.size) {
+    const payload = await getPayload({ config })
+    const data = await payload.find({
+      collection: 'posts',
+      depth: 1,
+      limit: slugs.size,
+      pagination: false,
+      where: {
+        and: [
+          { slug: { in: [...slugs] } },
+          { _status: { equals: 'published' } },
+        ],
+      },
+    })
+
+    for (const post of data.docs) {
+      if (post.slug) {
+        postsBySlug.set(post.slug, post as Post)
+      }
+    }
   }
 
   return layout.map((block) => {
@@ -199,9 +144,26 @@ export const injectLatestArticlesIntoLayout = async (
             return section
           }
 
+          const items = (section as { items?: GalleryItem[] | null }).items
+          if (!items?.length) {
+            return section
+          }
+
           return {
             ...section,
-            items: articles,
+            items: items.map((item) => {
+              const slug = item.href ? blogSlugFromHref(item.href) : null
+              const post = slug ? postsBySlug.get(slug) : null
+              if (!post) {
+                return item
+              }
+
+              return {
+                ...item,
+                publishedOn: item.publishedOn || post.publishedOn || null,
+                readingTime: item.readingTime || estimateReadingTime(post),
+              }
+            }),
           }
         }),
       },
