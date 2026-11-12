@@ -19,8 +19,13 @@ type GalleryItem = {
   [key: string]: unknown
 }
 
-/** Extra posts that must appear in Latest Articles even if missing from CMS cards. */
-const REQUIRED_LATEST_POST_SLUGS = ['buying-land-in-coorg-for-house-construction'] as const
+/** Blog posts that must appear in Latest Articles even if missing from CMS cards. */
+const REQUIRED_LATEST_POST_SLUGS = [
+  'buying-land-in-coorg-for-house-construction',
+  'commercial-building-construction-coorg',
+  'designing-a-home-in-coorg',
+  'house-construction-quality-checklist',
+] as const
 
 const isLatestArticlesSection = (section: unknown): boolean => {
   if (!section || typeof section !== 'object') {
