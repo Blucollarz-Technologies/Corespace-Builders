@@ -3,6 +3,7 @@
 import type { Media as MediaType } from '@root/payload-types'
 
 import { Media } from '@components/Media/index'
+import { formatArticleCardDate } from '@root/utilities/formatArticleCardDate'
 import { resolveCorespaceUrl } from '@root/utilities/resolveCorespaceUrl'
 import Link from 'next/link'
 import React, { useMemo, useState } from 'react'
@@ -26,6 +27,8 @@ export type GalleryItem = {
   id?: null | string
   image?: MediaType | null | string
   location: string
+  publishedOn?: null | string
+  readingTime?: null | number
   stage: GalleryStage
 }
 
@@ -61,6 +64,15 @@ const CATEGORY_LABELS: Record<GalleryCategory, string> = {
   'homestay-villa': 'Homestay & Villa',
   interiors: 'Interiors',
   projects: 'Projects',
+}
+
+const ARTICLE_CATEGORY_LABELS: Record<GalleryCategory, string> = {
+  architecture: 'Architecture',
+  construction: 'Construction',
+  'cost-guide': 'Cost Guide',
+  'homestay-villa': 'Villas & Homestays',
+  interiors: 'Interior Design',
+  projects: 'Renovation',
 }
 
 const STAGE_LABELS: Record<GalleryStage, string> = {
@@ -109,17 +121,22 @@ export const CorespaceProjectGallery: React.FC<CorespaceProjectGalleryProps> = (
 
     return normalizedItems.filter((item) => {
       const categoryMatch = category === 'all' || item.category === category
-      const stageMatch = stage === 'all' || item.stage === stage
+      const stageMatch = isArticlesGallery || stage === 'all' || item.stage === stage
       return categoryMatch && stageMatch
     })
-  }, [category, normalizedItems, stage])
+  }, [category, isArticlesGallery, normalizedItems, stage])
 
   if (!normalizedItems.length) {
     return null
   }
 
+  const categoryLabels = isArticlesGallery ? ARTICLE_CATEGORY_LABELS : CATEGORY_LABELS
+
   return (
-    <div className={classes.gallery}>
+    <div className={[classes.gallery, isArticlesGallery ? classes.articlesGallery : '']
+      .filter(Boolean)
+      .join(' ')}
+    >
       <div className={classes.header}>
         {eyebrow && (
           <p className={classes.eyebrow}>
@@ -175,7 +192,9 @@ export const CorespaceProjectGallery: React.FC<CorespaceProjectGalleryProps> = (
       </div>
 
       {filteredItems.length === 0 ? (
-        <p className={classes.empty}>No projects match these filters.</p>
+        <p className={classes.empty}>
+          {isArticlesGallery ? 'No articles match these filters.' : 'No projects match these filters.'}
+        </p>
       ) : (
         <ul className={classes.grid}>
           {filteredItems.map((item, index) => {
@@ -186,6 +205,11 @@ export const CorespaceProjectGallery: React.FC<CorespaceProjectGalleryProps> = (
             const href = item.href?.trim()
               ? resolveCorespaceUrl(item.href.trim()) || item.href.trim()
               : null
+            const publishedLabel = formatArticleCardDate(item.publishedOn)
+            const readingLabel =
+              typeof item.readingTime === 'number' && item.readingTime > 0
+                ? `${item.readingTime} min read`
+                : null
 
             const content = (
               <>
@@ -200,16 +224,28 @@ export const CorespaceProjectGallery: React.FC<CorespaceProjectGalleryProps> = (
                   )}
                 </div>
                 <div className={classes.body}>
-                  <p className={classes.category}>{CATEGORY_LABELS[item.category]}</p>
+                  <p className={classes.category}>{categoryLabels[item.category]}</p>
                   <h3 className={classes.location}>{item.location}</h3>
                   <p className={classes.description}>{item.description}</p>
+                  {isArticlesGallery && (publishedLabel || readingLabel) ? (
+                    <div className={classes.meta}>
+                      {publishedLabel ? <span>{publishedLabel}</span> : <span />}
+                      {readingLabel ? <span>{readingLabel}</span> : null}
+                    </div>
+                  ) : null}
                 </div>
               </>
             )
 
             return (
               <li
-                className={[classes.card, href ? classes.cardLink : ''].filter(Boolean).join(' ')}
+                className={[
+                  classes.card,
+                  isArticlesGallery ? classes.articleCard : '',
+                  href ? classes.cardLink : '',
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
                 key={item.id ?? `${item.location}-${index}`}
               >
                 {href ? (
