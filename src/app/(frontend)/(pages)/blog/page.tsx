@@ -34,7 +34,7 @@ const getLatestArticlesLayout = async (
     return enrichLatestArticlesInLayout(layout)
   }
 
-  return unstable_cache(enrichLatestArticlesInLayout, ['blog-latest-articles-v5'], {
+  return unstable_cache(enrichLatestArticlesInLayout, ['blog-latest-articles-v6'], {
     tags: ['page_blog', 'pages', 'posts'],
   })(layout)
 }

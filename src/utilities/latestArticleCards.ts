@@ -224,30 +224,33 @@ export const enrichLatestArticlesInLayout = async (
           }
 
           const existing = [...((section as { items?: GalleryItem[] | null }).items || [])]
-          const existingSlugs = new Set(
-            existing
-              .map((item) => (item.href ? blogSlugFromHref(item.href) : null))
-              .filter(Boolean) as string[],
-          )
+          const requiredSlugSet = new Set<string>(REQUIRED_LATEST_POST_SLUGS)
 
+          // Always use real post cards for required blog URLs (correct title/image).
           const requiredItems = REQUIRED_LATEST_POST_SLUGS.map((slug) => requiredBySlug.get(slug))
             .filter(Boolean)
-            .filter((post) => post?.slug && !existingSlugs.has(post.slug))
             .map((post) => toGalleryItemFromPost(post as Post))
 
-          const enrichedExisting = existing.map((item) => {
-            const slug = item.href ? blogSlugFromHref(item.href) : null
-            const post = slug ? postsBySlug.get(slug) : null
-            if (!post) {
-              return item
-            }
+          // Keep other curated cards, but drop CMS rows that already point at required posts
+          // (e.g. old "Property Upgrade Checklist" → quality-checklist).
+          const enrichedExisting = existing
+            .filter((item) => {
+              const slug = item.href ? blogSlugFromHref(item.href) : null
+              return !slug || !requiredSlugSet.has(slug)
+            })
+            .map((item) => {
+              const slug = item.href ? blogSlugFromHref(item.href) : null
+              const post = slug ? postsBySlug.get(slug) : null
+              if (!post) {
+                return item
+              }
 
-            return {
-              ...item,
-              publishedOn: item.publishedOn || post.publishedOn || null,
-              readingTime: item.readingTime || estimateReadingTime(post),
-            }
-          })
+              return {
+                ...item,
+                publishedOn: item.publishedOn || post.publishedOn || null,
+                readingTime: item.readingTime || estimateReadingTime(post),
+              }
+            })
 
           return {
             ...section,
