@@ -45,11 +45,6 @@ const isLatestArticlesSection = (section: unknown): boolean => {
   return /article/i.test(value.heading || '') || /latest|article/i.test(value.eyebrow || '')
 }
 
-const blogSlugFromHref = (href: string): null | string => {
-  const match = href.trim().match(/^\/blog\/([^/?#]+)\/?$/)
-  return match?.[1] || null
-}
-
 const estimateReadingTime = (post: Partial<Post>): number => {
   const text = [
     post.title || '',
@@ -119,9 +114,7 @@ const toGalleryItemFromPost = (post: Post): GalleryItem => {
 }
 
 /**
- * Keep CMS-curated Latest Articles cards (different service/guide URLs),
- * enrich /blog/{slug} cards with date/read time, and ensure required posts
- * like buying-land are present at the top.
+ * Latest Articles on /blog shows these real blog posts only (title, image, /blog/{slug}).
  */
 export const enrichLatestArticlesInLayout = async (
   layout: Page['layout'] | null | undefined,
@@ -163,45 +156,12 @@ export const enrichLatestArticlesInLayout = async (
     }
   }
 
-  const enrichSlugs = new Set<string>()
-  for (const block of layout) {
-    if (!block || typeof block !== 'object' || block.blockType !== 'corespaceTemplate') {
-      continue
-    }
-    for (const section of block.corespaceTemplateFields?.sections || []) {
-      if (!isLatestArticlesSection(section)) {
-        continue
-      }
-      for (const item of (section as { items?: GalleryItem[] | null }).items || []) {
-        const slug = item.href ? blogSlugFromHref(item.href) : null
-        if (slug) {
-          enrichSlugs.add(slug)
-        }
-      }
-    }
-  }
+  const requiredItems = REQUIRED_LATEST_POST_SLUGS.map((slug) => requiredBySlug.get(slug))
+    .filter(Boolean)
+    .map((post) => toGalleryItemFromPost(post as Post))
 
-  const postsBySlug = new Map<string, Post>(requiredBySlug)
-
-  if (enrichSlugs.size) {
-    const missing = [...enrichSlugs].filter((slug) => !postsBySlug.has(slug))
-    if (missing.length) {
-      const data = await payload.find({
-        collection: 'posts',
-        depth: 1,
-        limit: missing.length,
-        pagination: false,
-        where: {
-          and: [{ slug: { in: missing } }, { _status: { equals: 'published' } }],
-        },
-      })
-
-      for (const post of data.docs) {
-        if (post.slug) {
-          postsBySlug.set(post.slug, post as Post)
-        }
-      }
-    }
+  if (!requiredItems.length) {
+    return layout
   }
 
   return layout.map((block) => {
@@ -223,38 +183,9 @@ export const enrichLatestArticlesInLayout = async (
             return section
           }
 
-          const existing = [...((section as { items?: GalleryItem[] | null }).items || [])]
-          const requiredSlugSet = new Set<string>(REQUIRED_LATEST_POST_SLUGS)
-
-          // Always use real post cards for required blog URLs (correct title/image).
-          const requiredItems = REQUIRED_LATEST_POST_SLUGS.map((slug) => requiredBySlug.get(slug))
-            .filter(Boolean)
-            .map((post) => toGalleryItemFromPost(post as Post))
-
-          // Keep other curated cards, but drop CMS rows that already point at required posts
-          // (e.g. old "Property Upgrade Checklist" → quality-checklist).
-          const enrichedExisting = existing
-            .filter((item) => {
-              const slug = item.href ? blogSlugFromHref(item.href) : null
-              return !slug || !requiredSlugSet.has(slug)
-            })
-            .map((item) => {
-              const slug = item.href ? blogSlugFromHref(item.href) : null
-              const post = slug ? postsBySlug.get(slug) : null
-              if (!post) {
-                return item
-              }
-
-              return {
-                ...item,
-                publishedOn: item.publishedOn || post.publishedOn || null,
-                readingTime: item.readingTime || estimateReadingTime(post),
-              }
-            })
-
           return {
             ...section,
-            items: [...requiredItems, ...enrichedExisting],
+            items: requiredItems,
           }
         }),
       },
