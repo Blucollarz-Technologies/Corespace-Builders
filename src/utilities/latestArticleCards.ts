@@ -5,6 +5,7 @@ import config from '@payload-config'
 import { getPostCardDescription } from '@root/utilities/getPostCardDescription'
 import { getBlogPostPath } from '@root/utilities/postUrls'
 import { lexicalToPlaintext } from '@root/utilities/lexicalToPlaintext'
+import { unstable_cache } from 'next/cache'
 
 type GalleryItem = {
   category?: string
@@ -20,7 +21,7 @@ type GalleryItem = {
 }
 
 /** Blog posts that must appear in Latest Articles even if missing from CMS cards. */
-const REQUIRED_LATEST_POST_SLUGS = [
+export const REQUIRED_LATEST_POST_SLUGS = [
   'buying-land-in-coorg-for-house-construction',
   'commercial-building-construction-coorg',
   'designing-a-home-in-coorg',
@@ -173,24 +174,15 @@ const replaceLatestArticleItems = (
     }
   }) as Page['layout']
 
-/**
- * Latest Articles on /blog shows these real blog posts only (title, image, /blog/{slug}).
- */
-export const enrichLatestArticlesInLayout = async (
-  layout: Page['layout'] | null | undefined,
-): Promise<Page['layout'] | null | undefined> => {
-  if (!layout?.length || !layoutHasLatestArticles(layout)) {
-    return layout
-  }
-
+const loadRequiredLatestArticleItems = async (): Promise<GalleryItem[]> => {
   const payload = await getPayload({ config })
   const currentDate = new Date()
 
-  // Prefer published + scheduledOn filter (same as fetchBlogPosts).
   let requiredPosts = await payload.find({
     collection: 'posts',
     depth: 1,
     limit: REQUIRED_LATEST_POST_SLUGS.length,
+    overrideAccess: true,
     pagination: false,
     where: {
       and: [
@@ -201,7 +193,6 @@ export const enrichLatestArticlesInLayout = async (
     },
   })
 
-  // Fallback: slug-only (covers edge cases where publishedOn/_status differ in prod).
   if (!requiredPosts.docs.length) {
     requiredPosts = await payload.find({
       collection: 'posts',
@@ -215,6 +206,39 @@ export const enrichLatestArticlesInLayout = async (
     })
   }
 
+  // Last resort: fetch each slug individually (matches how /blog/[slug] resolves).
+  if (requiredPosts.docs.length < REQUIRED_LATEST_POST_SLUGS.length) {
+    const found = new Map<string, Post>()
+    for (const post of requiredPosts.docs) {
+      if (post.slug) {
+        found.set(post.slug, post as Post)
+      }
+    }
+
+    for (const slug of REQUIRED_LATEST_POST_SLUGS) {
+      if (found.has(slug)) {
+        continue
+      }
+
+      const single = await payload.find({
+        collection: 'posts',
+        depth: 1,
+        limit: 1,
+        overrideAccess: true,
+        pagination: false,
+        where: { slug: { equals: slug } },
+      })
+
+      if (single.docs[0]?.slug) {
+        found.set(single.docs[0].slug, single.docs[0] as Post)
+      }
+    }
+
+    return REQUIRED_LATEST_POST_SLUGS.map((slug) => found.get(slug))
+      .filter(Boolean)
+      .map((post) => toGalleryItemFromPost(post as Post))
+  }
+
   const requiredBySlug = new Map<string, Post>()
   for (const post of requiredPosts.docs) {
     if (post.slug) {
@@ -222,10 +246,32 @@ export const enrichLatestArticlesInLayout = async (
     }
   }
 
-  const requiredItems = REQUIRED_LATEST_POST_SLUGS.map((slug) => requiredBySlug.get(slug))
+  return REQUIRED_LATEST_POST_SLUGS.map((slug) => requiredBySlug.get(slug))
     .filter(Boolean)
     .map((post) => toGalleryItemFromPost(post as Post))
+}
 
+/** Cache only the post cards — never the full page layout object. */
+const getRequiredLatestArticleItems = unstable_cache(
+  loadRequiredLatestArticleItems,
+  ['required-latest-article-items-v1'],
+  {
+    tags: ['posts', 'page_blog', 'pages'],
+  },
+)
+
+/**
+ * Latest Articles on /blog shows these real blog posts only (title, image, /blog/{slug}).
+ * Always applies against the current layout (do not cache the enriched layout).
+ */
+export const enrichLatestArticlesInLayout = async (
+  layout: Page['layout'] | null | undefined,
+): Promise<Page['layout'] | null | undefined> => {
+  if (!layout?.length || !layoutHasLatestArticles(layout)) {
+    return layout
+  }
+
+  const requiredItems = await getRequiredLatestArticleItems()
   if (!requiredItems.length) {
     return layout
   }
