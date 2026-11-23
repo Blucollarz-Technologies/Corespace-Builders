@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 
-import { GoogleAnalytics } from '@components/Analytics/GoogleAnalytics/index'
 import {
   GoogleTagManagerHead,
   GoogleTagManagerNoScript,
@@ -34,7 +33,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       >
         <GoogleTagManagerNoScript />
         <PrivacyProvider>
-          <GoogleAnalytics />
+          {/* GA4 / Ads load only via GTM — do not mount a separate gtag.js here. */}
           <Providers>
             {children}
             <PrivacyBanner />
