@@ -1,6 +1,7 @@
 import type { CaseStudy, Page, Post } from '@root/payload-types'
 
 import { finalizePublicHref } from '@root/utilities/publicHref'
+import { trackWhatsAppClick } from '@root/utilities/gtm'
 import Link from 'next/link'
 import React from 'react'
 // eslint-disable-next-line import/no-cycle
@@ -40,7 +41,9 @@ export type CMSLinkType = {
   label?: null | string
   mobileFullWidth?: boolean
   newTab?: boolean | null
-  onClick?: (event: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>) => void
+  onClick?: (
+    event: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement | HTMLSpanElement>,
+  ) => void
   onMouseEnter?: () => void
   onMouseLeave?: () => void
   reference?: null | Reference
@@ -104,12 +107,19 @@ export const CMSLink: React.FC<CMSLinkType> = ({
   let href = generateHref({ type, reference, url, label })
   const openInNewTab = Boolean(newTab) || /wa\.me|whatsapp\.com/i.test(href)
 
+  const handleLinkClick = (event: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement | HTMLSpanElement>) => {
+    if (/wa\.me|whatsapp\.com/i.test(href)) {
+      trackWhatsAppClick({ label: label ?? undefined, url: href })
+    }
+    onClick?.(event)
+  }
+
   if (!href) {
     return (
       <span
         className={className}
         id={customId ?? ''}
-        onClick={onClick}
+        onClick={handleLinkClick}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
       >
@@ -144,7 +154,7 @@ export const CMSLink: React.FC<CMSLinkType> = ({
           {...newTabProps}
           className={className}
           id={customId ?? ''}
-          onClick={onClick}
+          onClick={handleLinkClick}
           onMouseEnter={onMouseEnter}
           onMouseLeave={onMouseLeave}
           prefetch={false}
@@ -161,7 +171,7 @@ export const CMSLink: React.FC<CMSLinkType> = ({
         {...newTabProps}
         className={className}
         id={customId ?? ''}
-        onClick={onClick}
+        onClick={handleLinkClick}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
       >
@@ -179,7 +189,7 @@ export const CMSLink: React.FC<CMSLinkType> = ({
     label,
     mobileFullWidth,
     newTab: openInNewTab,
-    onClick,
+    onClick: handleLinkClick,
     onMouseEnter,
     onMouseLeave,
   }

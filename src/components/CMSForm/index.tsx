@@ -13,6 +13,7 @@ import {
   resolveFormThankYouPath,
   type FormSource,
 } from '@root/utilities/formTracking'
+import { trackFormSubmit } from '@root/utilities/gtm'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import * as React from 'react'
 import { toast } from 'sonner'
@@ -114,6 +115,12 @@ const RenderForm = ({
           setHasSubmitted(true)
           toast.success('Form submitted successfully!')
 
+          trackFormSubmit({
+            formId: String(formID),
+            formName: form?.title ?? undefined,
+            source: formSource,
+          })
+
           const thankYouPath = resolveFormThankYouPath(formRedirect?.url)
           const redirectUrl = new URL(
             thankYouPath,
@@ -129,7 +136,7 @@ const RenderForm = ({
 
       void submitForm()
     },
-    [router, formID, formRedirect, formSource, pathname, searchParams],
+    [router, form, formID, formRedirect, formSource, pathname, searchParams],
   )
 
   if (!form?.id) {

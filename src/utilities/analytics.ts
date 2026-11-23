@@ -1,3 +1,5 @@
+import { pushDataLayer } from './gtm'
+
 const gaMeasurementID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID?.trim()
 const pixelID = process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID
 
@@ -5,11 +7,16 @@ const pixelID = process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID
 const isValidGa4Id = (id: string | undefined): id is string =>
   Boolean(id && /^G-[A-Z0-9]+$/i.test(id))
 
-export function analyticsEvent(event: string, value?: unknown): void {
+export function analyticsEvent(event: string, value?: Record<string, unknown>): void {
   const Window = window as any // eslint-disable-line @typescript-eslint/no-explicit-any
 
-  // Page-level gtag is disabled (GTM-only). Keep this guard so a bad env value
-  // like a website URL can never call gtag('config'/'event', 'https://...').
+  // Primary path: GTM listens for custom events on dataLayer.
+  pushDataLayer({
+    event,
+    ...(value && typeof value === 'object' ? value : {}),
+  })
+
+  // Optional: forward to gtag when GA4 tag in GTM has created window.gtag.
   if (isValidGa4Id(gaMeasurementID) && typeof Window.gtag === 'function') {
     Window.gtag('event', event, value)
   }

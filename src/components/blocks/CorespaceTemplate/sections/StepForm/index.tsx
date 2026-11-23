@@ -13,6 +13,7 @@ import {
   resolveFormThankYouPath,
 } from '@root/utilities/formTracking'
 import { useCostEstimateForm } from '@root/providers/CostEstimateForm/index'
+import { trackFormSubmit } from '@root/utilities/gtm'
 import { resolveWhatsAppUrl } from '@root/utilities/whatsapp'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import React, { useCallback, useMemo, useState } from 'react'
@@ -547,6 +548,11 @@ export const StepFormWizard: React.FC<StepFormWizardProps> = ({
 
       setHasSubmitted(true)
       toast.success('Form submitted successfully!')
+      trackFormSubmit({
+        formId: String(form.id),
+        formName: form.title ?? undefined,
+        source: formSource,
+      })
       onSubmitted?.()
 
       // Always land on thank-you (CMS redirect preferred, else /thank-you)
