@@ -113,59 +113,40 @@ const toGalleryItemFromPost = (post: Post): GalleryItem => {
   }
 }
 
-/**
- * Latest Articles on /blog shows these real blog posts only (title, image, /blog/{slug}).
- */
-export const enrichLatestArticlesInLayout = async (
-  layout: Page['layout'] | null | undefined,
-): Promise<Page['layout'] | null | undefined> => {
-  if (!layout?.length) {
-    return layout
-  }
-
-  const needsTouch = layout.some((block) => {
-    if (!block || typeof block !== 'object' || block.blockType !== 'corespaceTemplate') {
+const layoutHasLatestArticles = (layout: NonNullable<Page['layout']>): boolean =>
+  layout.some((block) => {
+    if (!block || typeof block !== 'object') {
       return false
     }
+
+    if (isLatestArticlesSection(block)) {
+      return true
+    }
+
+    if (block.blockType !== 'corespaceTemplate') {
+      return false
+    }
+
     return Boolean(block.corespaceTemplateFields?.sections?.some(isLatestArticlesSection))
   })
 
-  if (!needsTouch) {
-    return layout
-  }
-
-  const payload = await getPayload({ config })
-
-  const requiredPosts = await payload.find({
-    collection: 'posts',
-    depth: 1,
-    limit: REQUIRED_LATEST_POST_SLUGS.length,
-    pagination: false,
-    where: {
-      and: [
-        { slug: { in: [...REQUIRED_LATEST_POST_SLUGS] } },
-        { _status: { equals: 'published' } },
-      ],
-    },
-  })
-
-  const requiredBySlug = new Map<string, Post>()
-  for (const post of requiredPosts.docs) {
-    if (post.slug) {
-      requiredBySlug.set(post.slug, post as Post)
+const replaceLatestArticleItems = (
+  layout: NonNullable<Page['layout']>,
+  requiredItems: GalleryItem[],
+): Page['layout'] =>
+  layout.map((block) => {
+    if (!block || typeof block !== 'object') {
+      return block
     }
-  }
 
-  const requiredItems = REQUIRED_LATEST_POST_SLUGS.map((slug) => requiredBySlug.get(slug))
-    .filter(Boolean)
-    .map((post) => toGalleryItemFromPost(post as Post))
+    if (isLatestArticlesSection(block)) {
+      return {
+        ...block,
+        items: requiredItems,
+      }
+    }
 
-  if (!requiredItems.length) {
-    return layout
-  }
-
-  return layout.map((block) => {
-    if (!block || typeof block !== 'object' || block.blockType !== 'corespaceTemplate') {
+    if (block.blockType !== 'corespaceTemplate') {
       return block
     }
 
@@ -191,4 +172,63 @@ export const enrichLatestArticlesInLayout = async (
       },
     }
   }) as Page['layout']
+
+/**
+ * Latest Articles on /blog shows these real blog posts only (title, image, /blog/{slug}).
+ */
+export const enrichLatestArticlesInLayout = async (
+  layout: Page['layout'] | null | undefined,
+): Promise<Page['layout'] | null | undefined> => {
+  if (!layout?.length || !layoutHasLatestArticles(layout)) {
+    return layout
+  }
+
+  const payload = await getPayload({ config })
+  const currentDate = new Date()
+
+  // Prefer published + scheduledOn filter (same as fetchBlogPosts).
+  let requiredPosts = await payload.find({
+    collection: 'posts',
+    depth: 1,
+    limit: REQUIRED_LATEST_POST_SLUGS.length,
+    pagination: false,
+    where: {
+      and: [
+        { slug: { in: [...REQUIRED_LATEST_POST_SLUGS] } },
+        { _status: { equals: 'published' } },
+        { publishedOn: { less_than_equal: currentDate } },
+      ],
+    },
+  })
+
+  // Fallback: slug-only (covers edge cases where publishedOn/_status differ in prod).
+  if (!requiredPosts.docs.length) {
+    requiredPosts = await payload.find({
+      collection: 'posts',
+      depth: 1,
+      limit: REQUIRED_LATEST_POST_SLUGS.length,
+      overrideAccess: true,
+      pagination: false,
+      where: {
+        slug: { in: [...REQUIRED_LATEST_POST_SLUGS] },
+      },
+    })
+  }
+
+  const requiredBySlug = new Map<string, Post>()
+  for (const post of requiredPosts.docs) {
+    if (post.slug) {
+      requiredBySlug.set(post.slug, post as Post)
+    }
+  }
+
+  const requiredItems = REQUIRED_LATEST_POST_SLUGS.map((slug) => requiredBySlug.get(slug))
+    .filter(Boolean)
+    .map((post) => toGalleryItemFromPost(post as Post))
+
+  if (!requiredItems.length) {
+    return layout
+  }
+
+  return replaceLatestArticleItems(layout, requiredItems)
 }

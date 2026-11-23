@@ -21,7 +21,7 @@ const getPage = async (draft?: boolean) => {
     return fetchPage(SLUG)
   }
 
-  return unstable_cache(fetchPage, ['page-blog-v5'], {
+  return unstable_cache(fetchPage, ['page-blog-v8'], {
     tags: ['page_blog', 'pages', 'posts'],
   })(SLUG)
 }
@@ -34,10 +34,14 @@ const getLatestArticlesLayout = async (
     return enrichLatestArticlesInLayout(layout)
   }
 
-  return unstable_cache(enrichLatestArticlesInLayout, ['blog-latest-articles-v7'], {
+  // Bump cache key whenever Latest Articles mapping changes so production
+  // cannot keep serving stale CMS placeholder cards.
+  return unstable_cache(enrichLatestArticlesInLayout, ['blog-latest-articles-v8'], {
     tags: ['page_blog', 'pages', 'posts'],
   })(layout)
 }
+
+export const revalidate = 60
 
 export default async () => {
   const { isEnabled: draft } = await draftMode()
