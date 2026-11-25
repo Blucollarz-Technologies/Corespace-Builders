@@ -23,6 +23,8 @@ export const GoogleTagManagerHead: React.FC = () => {
   // ID is fixed in public/gtm-bootstrap.js to match production GTM-M54MD6F2.
   return (
     <>
+      {/* Consent Mode defaults — before GTM bootstrap */}
+      <script src="/gtm-consent-defaults.js" />
       {/* Google Tag Manager */}
       <script src="/gtm-bootstrap.js" />
       {/* End Google Tag Manager */}

@@ -21,24 +21,17 @@ const getPage = async (draft?: boolean) => {
     return fetchPage(SLUG)
   }
 
-  return unstable_cache(fetchPage, ['page-blog-v8'], {
+  return unstable_cache(fetchPage, ['page-blog-v9'], {
     tags: ['page_blog', 'pages', 'posts'],
   })(SLUG)
 }
 
 const getLatestArticlesLayout = async (
   layout: NonNullable<Awaited<ReturnType<typeof getPage>>>['layout'],
-  draft?: boolean,
 ) => {
-  if (draft || process.env.NODE_ENV === 'development') {
-    return enrichLatestArticlesInLayout(layout)
-  }
-
-  // Bump cache key whenever Latest Articles mapping changes so production
-  // cannot keep serving stale CMS placeholder cards.
-  return unstable_cache(enrichLatestArticlesInLayout, ['blog-latest-articles-v8'], {
-    tags: ['page_blog', 'pages', 'posts'],
-  })(layout)
+  // Always enrich the current layout. Caching the enriched layout object in
+  // production kept old CMS placeholder cards after merges.
+  return enrichLatestArticlesInLayout(layout)
 }
 
 export const revalidate = 60
@@ -51,7 +44,7 @@ export default async () => {
     notFound()
   }
 
-  const layout = (await getLatestArticlesLayout(page.layout, draft)) || page.layout
+  const layout = (await getLatestArticlesLayout(page.layout)) || page.layout
 
   return (
     <React.Fragment>

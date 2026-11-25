@@ -3125,9 +3125,17 @@ export interface CorespaceProjectGallerySection {
         location: string;
         description: string;
         /**
-         * Optional. Makes the card open this path on click (e.g. /blog/my-article or /service/architecture-design-karnataka).
+         * Optional. Makes the card open this path on click (e.g. /blog/my-article). Latest Articles on /blog auto-fills from published posts.
          */
         href?: string | null;
+        /**
+         * Optional. Shown on Latest Articles cards (e.g. Jun 2026).
+         */
+        publishedOn?: string | null;
+        /**
+         * Optional. Minutes shown on Latest Articles cards (e.g. 6).
+         */
+        readingTime?: number | null;
         id?: string | null;
       }[]
     | null;
